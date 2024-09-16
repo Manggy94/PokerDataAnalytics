@@ -1,0 +1,29 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES">
+      <option name="ignoredPackages">
+        <value>
+          <list size="2">
+            <item index="0" class="java.lang.String" itemvalue="attrs" />
+            <item index="1" class="java.lang.String" itemvalue="pkrhistoryparser" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="cards.models.Rank.*" />
+          <option value="cards.models.Hand.*" />
+          <option value="cards.models.Combo.*" />
+          <option value="cards.models.Flop.*" />
+          <option value="cards.models.Card.*" />
+          <option value="cards.models.Suit.*" />
+          <option value="actions.models.Street.*" />
+          <option value="handhistories.models.HandHistory.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
