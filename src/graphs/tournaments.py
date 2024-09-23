@@ -1,13 +1,29 @@
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
+from matplotlib.pyplot import title
+from plotly.subplots import make_subplots
+
 
 
 
 class TournamentGraphs:
     def __init__(self, tournaments: pd.DataFrame):
         self.tournaments = tournaments
+        self.tournaments_grouped = self.tournaments.groupby(["buy_in_total", "tournament_type", "speed"])
+        self.tournaments_resume = self.tournaments_grouped\
+            .agg(
+                nb_played=("tournament_id", "count"),
+                total_profit=("profit", "sum"),
+                mean_profit=("profit", "mean"),
+                mean_roi=("roi", "mean"),
+                mean_finish_percentage=("finish_percentage", "mean"),
+                finish_position=("final_position", "mean"),
+                total_players=("total_players", "mean"),
+                ITM=("ITM", "mean")
+            ).reset_index()
+
 
     def plot_profit_over_time(self):
         cumulative_profits = pd.DataFrame({
@@ -105,3 +121,68 @@ class TournamentGraphs:
             yaxis=dict(range=[-1, 2]),
         )
         fig3.show()
+
+    def plot_roi_vs_finish_position(self):
+        # Filtrer les types de tournois désirés
+        structured_tournaments = self.tournaments[self.tournaments["tournament_type"].isin(["CLASSIC", "KO", "FLIGHT"])]
+
+        trace1 = go.Scatter(
+            x=structured_tournaments["finish_percentage"],
+            y=structured_tournaments["freeze_out_roi"],
+            mode='markers',
+            marker=dict(color='blue', opacity=0.7),
+            text=structured_tournaments[["name", "profit"]],
+            hoverinfo='text',
+            name='ROI vs Finish Position'
+        )
+        trace2 = go.Scatter(
+            x=structured_tournaments["finish_percentage"],
+            y=structured_tournaments["freeze_out_percentage_won"],
+            mode='markers',
+            marker=dict(color='red', opacity=0.7),
+            text=structured_tournaments[["name", "profit"]],
+            hoverinfo='text',
+            name='FO Prizepool % won vs Finish Position'
+        )
+
+        # Créer une figure
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.02)
+
+        # Ajouter les points de dispersion
+        fig.add_trace(trace1, row=1, col=1)
+        fig.add_trace(trace2, row=2, col=1)
+
+        # Mettre à jour la mise en page de la figure
+        fig.update_layout(
+            title="ROI et % de prizepool gagné en fonction de la position finale",
+            xaxis_title="Position finale (%)",
+            template="plotly_white",  # Utilisation du thème light
+            legend_title="Légende",
+            font=dict(size=12),
+            hovermode='closest',
+            showlegend=True,
+            height=800,
+            width = 1200
+        )
+
+        # Mettre à jour les axes
+        fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor='LightGray', range=[20, 0])
+        fig.update_yaxes(
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='LightGray',
+            range=[-1, structured_tournaments["freeze_out_roi"].max() + 1],
+            title="ROI du Freeze-out",
+            row=1, col=1
+        )
+        fig.update_yaxes(
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='LightGray',
+            range=[0, 50],
+            title="% de prizepool gagné",
+            row=2, col=1
+        )
+
+        # Afficher la figure
+        fig.show()
