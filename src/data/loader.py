@@ -135,6 +135,10 @@ class DataLoader:
         tournaments["bounty_roi"] = tournaments["bounty_roi"].replace([np.inf, -np.inf], np.nan)
         tournaments["finish_percentage"] = tournaments["final_position"] / tournaments["total_players"]*100
         tournaments["ITM"] = tournaments["amount_won"] > 0
+        total_players_ranges = [1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
+        labels = [f"{total_players_range[0]+1} - {total_players_range[1]}" for total_players_range in zip(total_players_ranges[:-1], total_players_ranges[1:])]
+        tournaments["total_players_range"] = pd.cut(tournaments["total_players"], bins=total_players_ranges, labels=labels)
+        tournaments["total_players_range"] = pd.Categorical(tournaments["total_players_range"], categories=labels, ordered=True)
         return tournaments
 
     def load_raw_hand_histories(self):

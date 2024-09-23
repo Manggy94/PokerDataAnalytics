@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 class TournamentGraphs:
     def __init__(self, tournaments: pd.DataFrame):
         self.tournaments = tournaments
-        self.tournaments_grouped = self.tournaments.groupby(["buy_in_total", "tournament_type", "speed"])
+        self.tournaments_grouped = self.tournaments.groupby(["buy_in_total", "tournament_type", "speed", "total_players_range"])
         self.tournaments_resume = self.tournaments_grouped\
             .agg(
                 nb_played=("tournament_id", "count"),
@@ -131,8 +131,6 @@ class TournamentGraphs:
             y=structured_tournaments["freeze_out_roi"],
             mode='markers',
             marker=dict(color='blue', opacity=0.7),
-            text=structured_tournaments[["name", "profit"]],
-            hoverinfo='text',
             name='ROI vs Finish Position'
         )
         trace2 = go.Scatter(
@@ -140,8 +138,6 @@ class TournamentGraphs:
             y=structured_tournaments["freeze_out_percentage_won"],
             mode='markers',
             marker=dict(color='red', opacity=0.7),
-            text=structured_tournaments[["name", "profit"]],
-            hoverinfo='text',
             name='FO Prizepool % won vs Finish Position'
         )
 
@@ -185,4 +181,76 @@ class TournamentGraphs:
         )
 
         # Afficher la figure
+        fig.show()
+
+    def plot_mean_roi_by_categories(self):
+        tournaments_resume = self.tournaments_resume[self.tournaments_resume["nb_played"] > 10]
+        tournaments_resume = tournaments_resume[tournaments_resume["buy_in_total"] > 0]
+        fig = px.scatter_3d(
+            tournaments_resume,
+            x='buy_in_total',
+            y='tournament_type',
+            z='mean_roi',
+            color='total_players_range',
+            symbol='speed',
+            title='Mean ROI by categories',
+            labels={'buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'mean_roi': 'Mean ROI'},
+            opacity=0.7,
+        )
+        # x_range = [tournaments_resume["buy_in_total"].min(), tournaments_resume["buy_in_total"].max()]
+        # y_range = tournaments_resume["tournament_type"].unique()
+        # surface = go.Surface(
+        #     x=x_range,
+        #     y=y_range,
+        #     z=[[0, 0], [0, 0]],
+        #     colorscale=[[0, "red"], [1, "red"]],
+        #     showscale=False,
+        #     name="ROI = 0",
+        #     opacity=0.5
+        # )
+        # fig.add_trace(surface)
+        fig.update_layout(
+            width=800,
+            height=800,
+        )
+        fig.show()
+
+    def plot_mean_profit_by_categories(self):
+        tournaments_resume = self.tournaments_resume[self.tournaments_resume["nb_played"] > 10]
+        tournaments_resume = tournaments_resume[tournaments_resume["buy_in_total"] > 0]
+        fig = px.scatter_3d(
+            tournaments_resume,
+            x='buy_in_total',
+            y='tournament_type',
+            z='mean_profit',
+            color='total_players_range',
+            symbol='speed',
+            title='Mean Profit by categories',
+            labels={'buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'mean_profit': 'Mean Profit'},
+            opacity=0.7,
+        )
+        fig.update_layout(
+            width=800,
+            height=800,
+        )
+        fig.show()
+
+    def plot_ITM_by_categories(self):
+        tournaments_resume = self.tournaments_resume[self.tournaments_resume["nb_played"] > 10]
+        tournaments_resume = tournaments_resume[tournaments_resume["buy_in_total"] > 0]
+        fig = px.scatter_3d(
+            tournaments_resume,
+            x='buy_in_total',
+            y='tournament_type',
+            z='ITM',
+            color='total_players_range',
+            symbol='speed',
+            title='ITM by categories',
+            labels={'buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'ITM': 'ITM'},
+            opacity=0.7,
+        )
+        fig.update_layout(
+            width=800,
+            height=800,
+        )
         fig.show()
