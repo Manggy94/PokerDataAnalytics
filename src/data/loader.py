@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from config.settings import ANALYTICS_DATA_DIR
+from src.transformers.combos.combos_cards_merger import CombosCardsMerger
+from src.transformers.flops.flops_cards_merger import FlopsCardsMerger
+from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
 
 
 class DataLoader:
@@ -8,75 +11,48 @@ class DataLoader:
     def __init__(self):
         self.ANALYTICS_DATA_DIR = ANALYTICS_DATA_DIR
 
-    def load_cards(self):
-        cards = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/cards.csv', index_col=0)
-        return cards
+    def load_raw_cards(self):
+        raw_cards = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/cards.csv', index_col=0)
+        return raw_cards
+
+    def load_raw_combos(self):
+        raw_combos = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/combos.csv', index_col=0)
+        return raw_combos
 
     def load_combos(self):
-        cards = self.load_cards()
-        hands = self.load_hands()
-        combos = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/combos.csv', index_col=0)
-        # Merge combos and cards
-        combos = combos\
-            .merge(cards, how='left', left_on='first_card', right_on='id', suffixes=('', '_card1'))\
-            .merge(cards, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))
-        # Drop columns
-        columns_to_drop = ([c for c in combos.columns
-                           if ("id_" in c or "symbol" in c)] +
-                           ["name", "name_card2"] + ["first_card", "second_card"])
-
-        combos = combos.drop(columns=columns_to_drop)
-        # Rename columns on card1 to match the naming convention
-        correction_dict = {
-            "is_broadway": "is_broadway_card1",
-            "is_face": "is_face_card1",
-            "suit": "suit_card1",
-            "rank": "rank_card1",
-        }
-        combos = combos.rename(columns=correction_dict)
-        # Add prefix to columns
-        renaming_dict = {c: f"combo_{c}" for c in combos.columns}
-        combos = combos.rename(columns=renaming_dict)
+        raw_cards = self.load_raw_cards()
+        raw_combos = self.load_raw_combos()
+        merger = CombosCardsMerger(raw_cards)
+        combos = merger.fit_transform(raw_combos)
         return combos
 
-    def load_hands(self):
+    def load_raw_hands(self):
         hands = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/hands.csv', index_col=0)
         return hands
 
-    def load_flops(self):
-        cards = self.load_cards()
+    def load_raw_flops(self):
         flops = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flops.csv', index_col=0)
-        # Merge flops and cards
-        flops = flops\
-            .merge(cards, how='left', left_on='first_card', right_on='id', suffixes=('', '_card1'))\
-            .merge(cards, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))\
-            .merge(cards, how='left', left_on='third_card', right_on='id', suffixes=('', '_card3'))
-        columns_to_drop = ([c for c in flops.columns
-                           if ("id_" in c or "symbol" in c)] +
-                           ["name", "name_card2", "name_card3"] + ["first_card", "second_card", "third_card"])
-        # Drop columns
-        flops = flops.drop(columns=columns_to_drop)
-        # Rename columns on card1 to match the naming convention
-        correction_dict = {
-            "is_broadway": "is_broadway_card1",
-            "is_face": "is_face_card1",
-            "suit": "suit_card1",
-            "rank": "rank_card1",
-        }
-        flops = flops.rename(columns=correction_dict)
-        # Add prefix to columns
-        renaming_dict = {c: f"flop_{c}" for c in flops.columns}
-        flops = flops.rename(columns=renaming_dict)
         return flops
 
-    def load_levels(self):
+    def load_flops(self):
+        raw_cards = self.load_raw_cards()
+        raw_flops = self.load_raw_flops()
+        merger = FlopsCardsMerger(raw_cards)
+        flops = merger.fit_transform(raw_flops)
+        return flops
+
+    def load_raw_levels(self):
         levels = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/levels.csv', index_col=0)
         return levels
 
-    def load_positions(self):
+    def load_raw_positions(self):
         positions = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/positions.csv', index_col=0)
-        positions = positions.drop(columns=["short_name", "symbol", "preflop_order", "postflop_order"])\
-            .rename(columns={c: f"position_{c}" for c in positions.columns})
+        return positions
+
+    def load_positions(self):
+        raw_positions = self.load_raw_positions()
+        cleaner = PositionsColumnsCleaner()
+        positions = cleaner.fit_transform(raw_positions)
         return positions
 
     def load_raw_tournaments(self):
@@ -150,8 +126,7 @@ class DataLoader:
         """
         Load player hand stats from the database.
         """
-        player_hand_stats = pd.concat(
-            pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/player_hand_stats.csv', index_col=0, chunksize=10000))
+        player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/player_hand_stats.csv', index_col=0)
         return player_hand_stats
 
     def load_raw_general_player_hand_stats(self):
@@ -219,9 +194,9 @@ class DataLoader:
         return river_player_hand_stats
 
     def load_player_hand_stats(self):
-        levels = self.load_levels()
+        levels = self.load_raw_levels()
         combos = self.load_combos()
-        cards = self.load_cards()
+        cards = self.load_raw_cards()
         flops = self.load_flops()
         raw_player_hand_stats = self.load_raw_player_hand_stats()
         raw_hand_histories = self.load_raw_hand_histories()
@@ -276,3 +251,56 @@ class DataLoader:
         exploitable_filter =~ general_player_hand_stats["general_player_combo_short_name"].isna()
         general_player_hand_stats = general_player_hand_stats[exploitable_filter]
         return general_player_hand_stats
+
+    def load_raw_players(self):
+        players = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/players.csv', index_col=0)
+        return players
+
+    def load_raw_player_stats(self):
+        players = self.load_raw_players()
+        stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/player_stats.csv', index_col=0)
+        player_stats = players\
+            .merge(stats, how='left', left_on='id', right_on='player', suffixes=('_player', ''))\
+            .drop(columns=['id_player', 'player'])
+        return player_stats
+
+    def load_raw_general_player_stats(self):
+        general_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/general_player_stats.csv', index_col=0)
+        general_player_stats = general_player_stats.rename(columns={x: f"general_{x}" for x in general_player_stats.columns})
+        return general_player_stats
+
+    def load_raw_preflop_player_stats(self):
+        preflop_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/preflop_player_stats.csv', index_col=0)
+        preflop_player_stats = preflop_player_stats.rename(columns={x: f"preflop_{x}" for x in preflop_player_stats.columns})
+        return preflop_player_stats
+
+    def load_raw_flop_player_stats(self):
+        flop_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flop_player_stats.csv', index_col=0)
+        flop_player_stats = flop_player_stats.rename(columns={x: f"flop_{x}" for x in flop_player_stats.columns})
+        return flop_player_stats
+
+    def load_raw_turn_player_stats(self):
+        turn_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/turn_player_stats.csv', index_col=0)
+        turn_player_stats = turn_player_stats.rename(columns={x: f"turn_{x}" for x in turn_player_stats.columns})
+        return turn_player_stats
+
+    def load_raw_river_player_stats(self):
+        river_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/river_player_stats.csv', index_col=0)
+        river_player_stats = river_player_stats.rename(columns={x: f"river_{x}" for x in river_player_stats.columns})
+        return river_player_stats
+
+    def load_player_stats(self):
+        raw_player_stats = self.load_raw_player_stats()
+        general_player_stats = self.load_raw_general_player_stats()
+        preflop_player_stats = self.load_raw_preflop_player_stats()
+        flop_player_stats = self.load_raw_flop_player_stats()
+        turn_player_stats = self.load_raw_turn_player_stats()
+        river_player_stats = self.load_raw_river_player_stats()
+        player_stats = raw_player_stats\
+            .merge(general_player_stats, how='left', left_on='general_stats', right_on='general_id', suffixes=('', '_general'))\
+            .merge(preflop_player_stats, how='left', left_on='preflop_stats', right_on='preflop_id', suffixes=('', '_preflop'))\
+            .merge(flop_player_stats, how='left', left_on='flop_stats', right_on='flop_id', suffixes=('', '_flop'))\
+            .merge(turn_player_stats, how='left', left_on='turn_stats', right_on='turn_id', suffixes=('', '_turn'))\
+            .merge(river_player_stats, how='left', left_on='river_stats', right_on='river_id', suffixes=('', '_river'))
+        player_stats = player_stats.rename(columns={x: f"player_{x}" for x in player_stats.columns})
+        return player_stats
