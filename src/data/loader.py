@@ -100,7 +100,8 @@ class DataLoader:
 
     def load_hand_histories(self):
         raw_hand_histories = self.load_raw_hand_histories()
-        hh_pipeline = HandHistoriesPipeline()
+        raw_levels = self.load_raw_levels()
+        hh_pipeline = HandHistoriesPipeline(raw_levels)
         hand_histories = hh_pipeline.fit_transform(raw_hand_histories)
         return hand_histories
 
