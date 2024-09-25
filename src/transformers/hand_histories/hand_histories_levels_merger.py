@@ -13,4 +13,5 @@ class HandHistoriesLevelsMerger(BaseEstimator, TransformerMixin):
     def transform(self, X: pd.DataFrame):
         return X\
             .merge(self.levels, how="left", left_on="level", right_on="id", suffixes=("", "_level"))\
-            .drop(columns=["id_level", "level"]).rename(columns={c: f"level_{c}" for c in self.levels.columns})
+            .drop(columns=["id_level", "level"])\
+            .rename(columns={c: f"level_{c}" for c in self.levels.columns if c !="id"})
