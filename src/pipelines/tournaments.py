@@ -3,8 +3,8 @@ from sklearn.pipeline import Pipeline
 from src.transformers.tournaments.date_type_corrector import DateTypeCorrector
 from src.transformers.tournaments.final_position_imputer import FinalPositionImputer
 from src.transformers.tournaments.id_typer import IdTyper
+from src.transformers.tournaments.total_players_splitter import TotalPlayersSplitter
 from src.transformers.tournaments.tournaments_ref_tournaments_merger import TournamentRefTournamentsMerger
-
 
 class TournamentsPipeline(Pipeline):
     def __init__(self, ref_tournaments: pd.DataFrame):
@@ -13,5 +13,6 @@ class TournamentsPipeline(Pipeline):
             ("final_position_imputer", FinalPositionImputer()),
             ("id_typer", IdTyper()),
             ("tournament_ref_tournaments_merger", TournamentRefTournamentsMerger(ref_tournaments=ref_tournaments)),
-            ("date_type_corrector", DateTypeCorrector())
+            ("date_type_corrector", DateTypeCorrector()),
+            ("total_players_splitter", TotalPlayersSplitter())
         ])

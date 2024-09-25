@@ -92,8 +92,6 @@ class DataLoader:
 
         tournaments_pipeline = TournamentsPipeline(ref_tournaments=raw_ref_tournaments)
         tournaments = tournaments_pipeline.fit_transform(raw_tournaments)
-        # tournaments['start_date'] = pd.to_datetime(tournaments['start_date'])
-        # tournaments = tournaments.sort_values('start_date')
         # tournaments['total_won'] = tournaments['amount_won'] + tournaments['bounty_won']
         # tournaments['total_investment'] = tournaments['nb_entries'] * tournaments['buy_in_total']
         # tournaments['classic_investment'] = ((tournaments['prize_pool_contribution'] + tournaments['rake']) *
