@@ -1,9 +1,11 @@
 import pandas as pd
-import numpy as np
 from config.settings import ANALYTICS_DATA_DIR
+from src.pipelines.ref_tournaments import RefTournamentPipeline
+from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.combos.combos_cards_merger import CombosCardsMerger
 from src.transformers.flops.flops_cards_merger import FlopsCardsMerger
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
+
 
 
 class DataLoader:
@@ -63,6 +65,15 @@ class DataLoader:
         ref_tournaments = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/ref_tournaments.csv', index_col=0)
         return ref_tournaments
 
+    def load_ref_tournaments(self):
+        raw_ref_tournaments = self.load_raw_ref_tournaments()
+        raw_buy_ins = self.load_raw_buy_ins()
+        tour_types = self.load_raw_tour_types()
+        tour_speeds = self.load_raw_tour_speeds()
+        ref_tournaments_pipeline = RefTournamentPipeline(buy_ins=raw_buy_ins, tour_types=tour_types, tour_speeds=tour_speeds)
+        tournaments = ref_tournaments_pipeline.fit_transform(raw_ref_tournaments)
+        return tournaments
+
     def load_raw_buy_ins(self):
         buy_ins = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/buy_ins.csv', index_col=0)
         return buy_ins
@@ -77,44 +88,35 @@ class DataLoader:
 
     def load_tournaments(self):
         raw_tournaments = self.load_raw_tournaments()
-        raw_tournaments.tournament_id = raw_tournaments.tournament_id.astype("str")
-        raw_tournaments['final_position'] = raw_tournaments['final_position'].fillna(raw_tournaments['total_players']).astype("int32")
-        raw_ref_tournaments = self.load_raw_ref_tournaments()
-        raw_buy_ins = self.load_raw_buy_ins()
-        raw_tour_speeds = self.load_raw_tour_speeds()
-        raw_tour_types = self.load_raw_tour_types()
-        tournaments = raw_tournaments\
-            .merge(raw_ref_tournaments, how='left', left_on='ref_tournament', right_on='id', suffixes=('', '_ref'))\
-            .merge(raw_buy_ins, how='left', left_on='buy_in', right_on='id', suffixes=('', '_buy_in'))\
-            .merge(raw_tour_speeds, how='left', left_on='speed', right_on='id', suffixes=('', '_speed'))\
-            .merge(raw_tour_types, how='left', left_on='tournament_type', right_on='id', suffixes=('', '_type'))\
-            .drop(columns=['id', 'ref_tournament', 'id_ref', 'buy_in', 'id_buy_in', 'speed', 'id_speed',
-                           'tournament_type', 'id_type'])\
-            .rename(columns={'name_speed': 'speed', 'name_type': 'tournament_type', "total": "buy_in_total"})
-        tournaments['start_date'] = pd.to_datetime(tournaments['start_date'])
-        tournaments = tournaments.sort_values('start_date')
-        tournaments['total_won'] = tournaments['amount_won'] + tournaments['bounty_won']
-        tournaments['total_investment'] = tournaments['nb_entries'] * tournaments['buy_in_total']
-        tournaments['classic_investment'] = ((tournaments['prize_pool_contribution'] + tournaments['rake']) *
-                                             tournaments['nb_entries'])
-        tournaments["bounty_investment"] = tournaments["nb_entries"] * tournaments["bounty"]
-        tournaments["prize_pool_percentage_won"] = tournaments["total_won"] / tournaments["prize_pool"]*100
-        tournaments["freeze_out_percentage_won"] = tournaments["amount_won"] / tournaments["prize_pool"]*100
-        tournaments["profit"] = tournaments["total_won"] - tournaments["total_investment"]
-        tournaments["freeze_out_profit"] = tournaments["amount_won"] - tournaments["classic_investment"]
-        tournaments["bounty_profit"] = tournaments["bounty_won"] - tournaments["bounty_investment"]
-        tournaments['roi'] = tournaments["profit"] / tournaments['total_investment']
-        tournaments["freeze_out_roi"] = tournaments["freeze_out_profit"] / tournaments["classic_investment"]
-        tournaments["bounty_roi"] = tournaments["bounty_profit"] / tournaments["bounty_investment"]
-        tournaments['roi'] = tournaments['roi'].replace([np.inf, -np.inf], np.nan)
-        tournaments["freeze_out_roi"] = tournaments["freeze_out_roi"].replace([np.inf, -np.inf], np.nan)
-        tournaments["bounty_roi"] = tournaments["bounty_roi"].replace([np.inf, -np.inf], np.nan)
-        tournaments["finish_percentage"] = tournaments["final_position"] / tournaments["total_players"]*100
-        tournaments["ITM"] = tournaments["amount_won"] > 0
-        total_players_ranges = [1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
-        labels = [f"{total_players_range[0]+1} - {total_players_range[1]}" for total_players_range in zip(total_players_ranges[:-1], total_players_ranges[1:])]
-        tournaments["total_players_range"] = pd.cut(tournaments["total_players"], bins=total_players_ranges, labels=labels)
-        tournaments["total_players_range"] = pd.Categorical(tournaments["total_players_range"], categories=labels, ordered=True)
+        raw_ref_tournaments = self.load_ref_tournaments()
+
+        tournaments_pipeline = TournamentsPipeline(ref_tournaments=raw_ref_tournaments)
+        tournaments = tournaments_pipeline.fit_transform(raw_tournaments)
+        #     .merge(raw_ref_tournaments, how='left', left_on='ref_tournament', right_on='id', suffixes=('', '_ref'))\
+        # tournaments['start_date'] = pd.to_datetime(tournaments['start_date'])
+        # tournaments = tournaments.sort_values('start_date')
+        # tournaments['total_won'] = tournaments['amount_won'] + tournaments['bounty_won']
+        # tournaments['total_investment'] = tournaments['nb_entries'] * tournaments['buy_in_total']
+        # tournaments['classic_investment'] = ((tournaments['prize_pool_contribution'] + tournaments['rake']) *
+        #                                      tournaments['nb_entries'])
+        # tournaments["bounty_investment"] = tournaments["nb_entries"] * tournaments["bounty"]
+        # tournaments["prize_pool_percentage_won"] = tournaments["total_won"] / tournaments["prize_pool"]*100
+        # tournaments["freeze_out_percentage_won"] = tournaments["amount_won"] / tournaments["prize_pool"]*100
+        # tournaments["profit"] = tournaments["total_won"] - tournaments["total_investment"]
+        # tournaments["freeze_out_profit"] = tournaments["amount_won"] - tournaments["classic_investment"]
+        # tournaments["bounty_profit"] = tournaments["bounty_won"] - tournaments["bounty_investment"]
+        # tournaments['roi'] = tournaments["profit"] / tournaments['total_investment']
+        # tournaments["freeze_out_roi"] = tournaments["freeze_out_profit"] / tournaments["classic_investment"]
+        # tournaments["bounty_roi"] = tournaments["bounty_profit"] / tournaments["bounty_investment"]
+        # tournaments['roi'] = tournaments['roi'].replace([np.inf, -np.inf], np.nan)
+        # tournaments["freeze_out_roi"] = tournaments["freeze_out_roi"].replace([np.inf, -np.inf], np.nan)
+        # tournaments["bounty_roi"] = tournaments["bounty_roi"].replace([np.inf, -np.inf], np.nan)
+        # tournaments["finish_percentage"] = tournaments["final_position"] / tournaments["total_players"]*100
+        # tournaments["ITM"] = tournaments["amount_won"] > 0
+        # total_players_ranges = [1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]
+        # labels = [f"{total_players_range[0]+1} - {total_players_range[1]}" for total_players_range in zip(total_players_ranges[:-1], total_players_ranges[1:])]
+        # tournaments["total_players_range"] = pd.cut(tournaments["total_players"], bins=total_players_ranges, labels=labels)
+        # tournaments["total_players_range"] = pd.Categorical(tournaments["total_players_range"], categories=labels, ordered=True)
         return tournaments
 
     def load_raw_hand_histories(self):
