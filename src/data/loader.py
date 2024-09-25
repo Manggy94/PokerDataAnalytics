@@ -1,5 +1,6 @@
 import pandas as pd
 from config.settings import ANALYTICS_DATA_DIR
+from src.pipelines.hand_histories import HandHistoriesPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.combos.combos_cards_merger import CombosCardsMerger
@@ -99,8 +100,8 @@ class DataLoader:
 
     def load_hand_histories(self):
         raw_hand_histories = self.load_raw_hand_histories()
-        hand_histories = raw_hand_histories
-        hand_histories['hand_date'] = pd.to_datetime(hand_histories['hand_date'])
+        hh_pipeline = HandHistoriesPipeline()
+        hand_histories = hh_pipeline.fit_transform(raw_hand_histories)
         return hand_histories
 
     def load_raw_player_hand_stats(self):
@@ -180,7 +181,7 @@ class DataLoader:
         cards = self.load_raw_cards()
         flops = self.load_flops()
         raw_player_hand_stats = self.load_raw_player_hand_stats()
-        raw_hand_histories = self.load_raw_hand_histories()
+        raw_hand_histories = self.load_hand_histories()
         raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
         raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
         raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
