@@ -99,9 +99,12 @@ class DataLoader:
         return raw_hand_histories
 
     def load_hand_histories(self):
+        raw_cards = self.load_raw_cards()
+        combos = self.load_combos()
+        flops = self.load_flops()
         raw_hand_histories = self.load_raw_hand_histories()
         raw_levels = self.load_raw_levels()
-        hh_pipeline = HandHistoriesPipeline(raw_levels)
+        hh_pipeline = HandHistoriesPipeline(levels=raw_levels, flops=flops, cards=raw_cards, combos=combos)
         hand_histories = hh_pipeline.fit_transform(raw_hand_histories)
         return hand_histories
 
@@ -177,10 +180,8 @@ class DataLoader:
         return river_player_hand_stats
 
     def load_player_hand_stats(self):
-        levels = self.load_raw_levels()
         combos = self.load_combos()
         cards = self.load_raw_cards()
-        flops = self.load_flops()
         raw_player_hand_stats = self.load_raw_player_hand_stats()
         raw_hand_histories = self.load_hand_histories()
         raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
@@ -192,12 +193,6 @@ class DataLoader:
         player_hand_stats = raw_player_hand_stats\
             .merge(raw_hand_histories, how='left', left_on='hand_history', right_on='id', suffixes=('', '_hand'))\
             .drop(columns=['id_hand'])
-        # Merge player_hand_stats and level
-        player_hand_stats = player_hand_stats\
-            .merge(levels, how='left', left_on='level', right_on='id', suffixes=('', '_level'))\
-        # Merge player_hand_stats and flop
-        player_hand_stats = player_hand_stats\
-            .merge(flops, how='left', left_on='flop', right_on='flop_id', suffixes=('', '_flop'))
         # Merge player_hand_stats and turn
         player_hand_stats = player_hand_stats\
             .merge(cards, how='left', left_on='turn', right_on='id', suffixes=('', '_turn'))\
