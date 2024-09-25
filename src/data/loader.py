@@ -201,10 +201,6 @@ class DataLoader:
         player_hand_stats = player_hand_stats\
             .merge(cards, how='left', left_on='river', right_on='id', suffixes=('', '_river'))\
             .rename(columns={x: f"river_{x}" for x in cards.columns}).drop(columns=["river_name", "river_symbol"])
-        # Merge player_hand_stats and hero_combo
-        player_hand_stats = player_hand_stats\
-            .merge(combos, how='left', left_on='hero_combo', right_on='combo_id', suffixes=('', '_hero_combo'))\
-            .rename(columns={x: f"hero_{x}" for x in combos.columns})
         # Drop some useless columns
         columns_to_drop = ["flop_id", "turn_id", "river_id", "hero_combo", "hand_history", "level", "id_level",
                            "hero_combo"]
