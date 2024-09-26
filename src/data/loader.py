@@ -1,5 +1,6 @@
 import pandas as pd
 from config.settings import ANALYTICS_DATA_DIR
+from src.pipelines.cards import CardsPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
@@ -14,18 +15,35 @@ class DataLoader:
     def __init__(self):
         self.ANALYTICS_DATA_DIR = ANALYTICS_DATA_DIR
 
+    def load_raw_suits(self):
+        suits = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/suits.csv', index_col=0)
+        return suits
+
+    def load_raw_ranks(self):
+        ranks = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/ranks.csv', index_col=0)
+        return ranks
+
+
     def load_raw_cards(self):
         raw_cards = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/cards.csv', index_col=0)
         return raw_cards
+
+    def load_cards(self):
+        raw_ranks = self.load_raw_ranks()
+        raw_suits = self.load_raw_suits()
+        raw_cards = self.load_raw_cards()
+        cards_pipeline = CardsPipeline(ranks=raw_ranks, suits=raw_suits)
+        cards = cards_pipeline.fit_transform(raw_cards)
+        return cards
 
     def load_raw_combos(self):
         raw_combos = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/combos.csv', index_col=0)
         return raw_combos
 
     def load_combos(self):
-        raw_cards = self.load_raw_cards()
+        cards = self.load_cards()
         raw_combos = self.load_raw_combos()
-        merger = CombosCardsMerger(raw_cards)
+        merger = CombosCardsMerger(cards)
         combos = merger.fit_transform(raw_combos)
         return combos
 
@@ -99,12 +117,12 @@ class DataLoader:
         return raw_hand_histories
 
     def load_hand_histories(self):
-        raw_cards = self.load_raw_cards()
+        cards = self.load_cards()
         combos = self.load_combos()
         flops = self.load_flops()
         raw_hand_histories = self.load_raw_hand_histories()
         raw_levels = self.load_raw_levels()
-        hh_pipeline = HandHistoriesPipeline(levels=raw_levels, flops=flops, cards=raw_cards, combos=combos)
+        hh_pipeline = HandHistoriesPipeline(levels=raw_levels, flops=flops, cards=cards, combos=combos)
         hand_histories = hh_pipeline.fit_transform(raw_hand_histories)
         return hand_histories
 
@@ -180,7 +198,6 @@ class DataLoader:
         return river_player_hand_stats
 
     def load_player_hand_stats(self):
-        cards = self.load_raw_cards()
         raw_player_hand_stats = self.load_raw_player_hand_stats()
         raw_hand_histories = self.load_hand_histories()
         raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
@@ -192,14 +209,6 @@ class DataLoader:
         player_hand_stats = raw_player_hand_stats\
             .merge(raw_hand_histories, how='left', left_on='hand_history', right_on='id', suffixes=('', '_hand'))\
             .drop(columns=['id_hand'])
-        # Merge player_hand_stats and turn
-        player_hand_stats = player_hand_stats\
-            .merge(cards, how='left', left_on='turn', right_on='id', suffixes=('', '_turn'))\
-            .rename(columns={x: f"turn_{x}" for x in cards.columns}).drop(columns=["turn_name", "turn_symbol"])
-        # Merge player_hand_stats and river
-        player_hand_stats = player_hand_stats\
-            .merge(cards, how='left', left_on='river', right_on='id', suffixes=('', '_river'))\
-            .rename(columns={x: f"river_{x}" for x in cards.columns}).drop(columns=["river_name", "river_symbol"])
         # Drop some useless columns
         columns_to_drop = [ "turn_id", "river_id", "hand_history"]
         player_hand_stats = player_hand_stats.drop(columns=columns_to_drop)
