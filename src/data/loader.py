@@ -24,6 +24,9 @@ class DataLoader:
         ranks = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/ranks.csv', index_col=0)
         return ranks
 
+    def load_raw_action_moves(self):
+        action_moves = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/action_moves.csv', index_col=0)
+        return action_moves
 
     def load_raw_cards(self):
         raw_cards = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/cards.csv', index_col=0)
@@ -152,20 +155,17 @@ class DataLoader:
         # general_player_hand_stats = general_player_hand_stats\
         #     .merge(combos, how='left', left_on='combo', right_on='combo_id', suffixes=('', '_combo'))\
         #     .rename(columns={x: f"player_{x}" for x in combos.columns})
-        # # Merge with positions
-        # general_player_hand_stats = general_player_hand_stats\
-        #     .merge(positions, how='left', left_on='position', right_on='position_id', suffixes=('', '_position'))\
-        #     .drop(columns=["position_id", "position"])\
-        #     .rename(columns={x: f"player_{x}" for x in positions.columns})
         # general_player_hand_stats = general_player_hand_stats.rename(
         #     columns={x: f"general_{x}" for x in general_player_hand_stats.columns})
         return general_player_hand_stats
 
     def load_general_player_hand_stats(self):
         raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
+        action_moves = self.load_raw_action_moves()
         combos = self.load_combos()
         positions = self.load_positions()
-        pipeline = GeneralPlayerHandStatsPipeline(combos=combos, positions=positions)
+        streets = self.load_raw_streets()
+        pipeline = GeneralPlayerHandStatsPipeline(combos=combos, positions=positions, action_moves=action_moves, streets=streets)
         general_player_hand_stats = pipeline.fit_transform(raw_general_player_hand_stats)
         return general_player_hand_stats
 
