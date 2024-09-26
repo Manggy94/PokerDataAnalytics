@@ -2,11 +2,10 @@ import pandas as pd
 from config.settings import ANALYTICS_DATA_DIR
 from src.pipelines.cards import CardsPipeline
 from src.pipelines.combos import CombosPipeline
+from src.pipelines.flops import FlopsPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
-from src.transformers.combos.combos_cards_merger import CombosCardsMerger
-from src.transformers.flops.flops_cards_merger import FlopsCardsMerger
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
 
 
@@ -58,10 +57,10 @@ class DataLoader:
         return flops
 
     def load_flops(self):
-        raw_cards = self.load_raw_cards()
+        cards = self.load_cards()
         raw_flops = self.load_raw_flops()
-        merger = FlopsCardsMerger(raw_cards)
-        flops = merger.fit_transform(raw_flops)
+        flops_pipeline = FlopsPipeline(cards=cards)
+        flops = flops_pipeline.fit_transform(raw_flops)
         return flops
 
     def load_raw_levels(self):
