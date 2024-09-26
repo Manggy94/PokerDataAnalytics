@@ -1,6 +1,7 @@
 import pandas as pd
 from config.settings import ANALYTICS_DATA_DIR
 from src.pipelines.cards import CardsPipeline
+from src.pipelines.combos import CombosPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
@@ -42,9 +43,10 @@ class DataLoader:
 
     def load_combos(self):
         cards = self.load_cards()
+        hands = self.load_raw_hands()
         raw_combos = self.load_raw_combos()
-        merger = CombosCardsMerger(cards)
-        combos = merger.fit_transform(raw_combos)
+        combos_pipeline = CombosPipeline(cards=cards, hands=hands)
+        combos = combos_pipeline.fit_transform(raw_combos)
         return combos
 
     def load_raw_hands(self):
