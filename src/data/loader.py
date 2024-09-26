@@ -4,6 +4,7 @@ from src.pipelines.cards import CardsPipeline
 from src.pipelines.combos import CombosPipeline
 from src.pipelines.flops import FlopsPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
+from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
@@ -57,8 +58,8 @@ class DataLoader:
         return flops
 
     def load_flops(self):
-        cards = self.load_cards()
         raw_flops = self.load_raw_flops()
+        cards = self.load_cards()
         flops_pipeline = FlopsPipeline(cards=cards)
         flops = flops_pipeline.fit_transform(raw_flops)
         return flops
@@ -76,6 +77,10 @@ class DataLoader:
         cleaner = PositionsColumnsCleaner()
         positions = cleaner.fit_transform(raw_positions)
         return positions
+
+    def load_raw_streets(self):
+        streets = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/streets.csv', index_col=0)
+        return streets
 
     def load_raw_tournaments(self):
         tournaments = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/tournaments.csv', index_col=0)
@@ -118,10 +123,10 @@ class DataLoader:
         return raw_hand_histories
 
     def load_hand_histories(self):
+        raw_hand_histories = self.load_raw_hand_histories()
         cards = self.load_cards()
         combos = self.load_combos()
         flops = self.load_flops()
-        raw_hand_histories = self.load_raw_hand_histories()
         raw_levels = self.load_raw_levels()
         hh_pipeline = HandHistoriesPipeline(levels=raw_levels, flops=flops, cards=cards, combos=combos)
         hand_histories = hh_pipeline.fit_transform(raw_hand_histories)
@@ -140,22 +145,28 @@ class DataLoader:
         """
         combos = self.load_combos()
         positions = self.load_positions()
-        general_player_hand_stats = pd.concat(
-            pd.read_csv(
-                f'{self.ANALYTICS_DATA_DIR}/general_player_hand_stats.csv', index_col=0, chunksize=10000))
-        # Drop rows with missing position
-        general_player_hand_stats = general_player_hand_stats.dropna(subset=["position"])
-        #Merge with combos
-        general_player_hand_stats = general_player_hand_stats\
-            .merge(combos, how='left', left_on='combo', right_on='combo_id', suffixes=('', '_combo'))\
-            .rename(columns={x: f"player_{x}" for x in combos.columns})
-        # Merge with positions
-        general_player_hand_stats = general_player_hand_stats\
-            .merge(positions, how='left', left_on='position', right_on='position_id', suffixes=('', '_position'))\
-            .drop(columns=["position_id", "position"])\
-            .rename(columns={x: f"player_{x}" for x in positions.columns})
-        general_player_hand_stats = general_player_hand_stats.rename(
-            columns={x: f"general_{x}" for x in general_player_hand_stats.columns})
+        general_player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/general_player_hand_stats.csv', index_col=0)
+        # # Drop rows with missing position
+        # general_player_hand_stats = general_player_hand_stats.dropna(subset=["position"])
+        # #Merge with combos
+        # general_player_hand_stats = general_player_hand_stats\
+        #     .merge(combos, how='left', left_on='combo', right_on='combo_id', suffixes=('', '_combo'))\
+        #     .rename(columns={x: f"player_{x}" for x in combos.columns})
+        # # Merge with positions
+        # general_player_hand_stats = general_player_hand_stats\
+        #     .merge(positions, how='left', left_on='position', right_on='position_id', suffixes=('', '_position'))\
+        #     .drop(columns=["position_id", "position"])\
+        #     .rename(columns={x: f"player_{x}" for x in positions.columns})
+        # general_player_hand_stats = general_player_hand_stats.rename(
+        #     columns={x: f"general_{x}" for x in general_player_hand_stats.columns})
+        return general_player_hand_stats
+
+    def load_general_player_hand_stats(self):
+        raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
+        combos = self.load_combos()
+        positions = self.load_positions()
+        pipeline = GeneralPlayerHandStatsPipeline(combos=combos, positions=positions)
+        general_player_hand_stats = pipeline.fit_transform(raw_general_player_hand_stats)
         return general_player_hand_stats
 
     def load_raw_preflop_player_hand_stats(self):
