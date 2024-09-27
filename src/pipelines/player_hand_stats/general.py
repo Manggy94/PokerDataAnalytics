@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from src.transformers.player_hand_stats.general.all_in_street_merger import AllInStreetMerger
 from src.transformers.player_hand_stats.general.combos_merger import CombosMerger
+from src.transformers.player_hand_stats.general.fold_street_merger import FoldStreetMerger
 from src.transformers.player_hand_stats.general.na_dropper import NaDropper
 from src.transformers.player_hand_stats.general.positions_merger import PositionsMerger
 from src.transformers.player_hand_stats.general.seats_categorizer import SeatsCategorizer
@@ -19,5 +20,6 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
             ("seats_categorizer", SeatsCategorizer()),
             ("combos_merger", CombosMerger(combos)),
             ("positions_merger", PositionsMerger(positions)),
-            ("all_in_street_merger", AllInStreetMerger(streets))
+            ("all_in_street_merger", AllInStreetMerger(streets)),
+            ("fold_street_merger", FoldStreetMerger(streets)),
         ])
