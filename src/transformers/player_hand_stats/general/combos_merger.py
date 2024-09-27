@@ -12,6 +12,6 @@ class CombosMerger(BaseEstimator, TransformerMixin):
 
         def transform(self, X: pd.DataFrame):
             return X\
-                .merge(self.combos, how="left", left_on="combo", right_on="combo_id", suffixes=("", "_combo"))\
-                .drop(columns=["combo_id", "combo"])\
-                .rename(columns={c: f"player_{c}" for c in self.combos.columns})
+                .merge(self.combos, how="left", left_on="combo", right_on="id", suffixes=("", "_combo"))\
+                .drop(columns=["id_combo", "combo"])\
+                .rename(columns={c: f"player_combo_{c}" for c in self.combos.columns if c != "id"})

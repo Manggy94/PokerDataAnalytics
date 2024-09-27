@@ -12,5 +12,4 @@ class CombosPipeline(Pipeline):
         super().__init__(steps=[
             ("combos_hands_merger", CombosHandsMerger(hands)),
             ("combos_cards_merger", CombosCardsMerger(cards)),
-
         ])
