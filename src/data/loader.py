@@ -4,6 +4,7 @@ from src.pipelines.cards import CardsPipeline
 from src.pipelines.combos import CombosPipeline
 from src.pipelines.flops import FlopsPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
+from src.pipelines.hands import HandsPipeline
 from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
@@ -54,6 +55,14 @@ class DataLoader:
 
     def load_raw_hands(self):
         hands = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/hands.csv', index_col=0)
+        return hands
+
+    def load_hands(self):
+        raw_hands = self.load_raw_hands()
+        ranks = self.load_raw_ranks()
+        suits = self.load_raw_suits()
+        hands_pipeline = HandsPipeline(ranks=ranks, suits=suits)
+        hands = hands_pipeline.fit_transform(raw_hands)
         return hands
 
     def load_raw_flops(self):
