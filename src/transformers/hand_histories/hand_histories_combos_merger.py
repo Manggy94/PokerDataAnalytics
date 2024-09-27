@@ -12,6 +12,6 @@ class HandHistoriesCombosMerger(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         return X\
-            .merge(self.combos, how="left", left_on="hero_combo", right_on="id", suffixes=("", "_hero_combo"))\
+            .merge(self.combos, how="left", left_on="hero_combo", right_on="id", suffixes=("", "_combo"))\
             .drop(columns=["id_combo", "hero_combo"])\
             .rename(columns={c: f"hero_combo_{c}" for c in self.combos.columns if c != "id"})
