@@ -13,19 +13,10 @@ class CombosCardsMerger(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        combos = X\
+        return X\
             .merge(self.cards, how='left', left_on='first_card', right_on='id', suffixes=('', '_card1'))\
-            .merge(self.cards, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))
-        columns_to_drop = ([c for c in combos.columns if ("id_" in c or "symbol" in c)] +
-                           ["name", "name_card2"] + ["first_card", "second_card"])
-        combos = combos.drop(columns=columns_to_drop)
-        correction_dict = {
-            "is_broadway": "is_broadway_card1",
-            "is_face": "is_face_card1",
-            "suit": "suit_card1",
-            "rank": "rank_card1",
-        }
-        combos = combos.rename(columns=correction_dict)
-        renaming_dict = {c: f"combo_{c}" for c in combos.columns}
-        X = combos.rename(columns=renaming_dict)
-        return X
+            .drop(columns=['id_card1', 'first_card', 'name', 'symbol'])\
+            .rename(columns={c: f"first_card_{c}" for c in self.cards.columns if c != "id"})\
+            .merge(self.cards, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))\
+            .drop(columns=['id_card2', 'second_card', 'name', 'symbol'])\
+            .rename(columns={c: f"second_card_{c}" for c in self.cards.columns if c != "id"})
