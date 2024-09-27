@@ -146,17 +146,7 @@ class DataLoader:
         """
         Load general player hand stats from the database.
         """
-        combos = self.load_combos()
-        positions = self.load_positions()
         general_player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/general_player_hand_stats.csv', index_col=0)
-        # # Drop rows with missing position
-        # general_player_hand_stats = general_player_hand_stats.dropna(subset=["position"])
-        # #Merge with combos
-        # general_player_hand_stats = general_player_hand_stats\
-        #     .merge(combos, how='left', left_on='combo', right_on='combo_id', suffixes=('', '_combo'))\
-        #     .rename(columns={x: f"player_{x}" for x in combos.columns})
-        # general_player_hand_stats = general_player_hand_stats.rename(
-        #     columns={x: f"general_{x}" for x in general_player_hand_stats.columns})
         return general_player_hand_stats
 
     def load_general_player_hand_stats(self):
