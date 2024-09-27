@@ -25,6 +25,10 @@ class DataLoader:
         ranks = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/ranks.csv', index_col=0)
         return ranks
 
+    def load_raw_shapes(self):
+        shapes = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/shapes.csv', index_col=0)
+        return shapes
+
     def load_raw_action_moves(self):
         action_moves = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/action_moves.csv', index_col=0)
         return action_moves
@@ -60,8 +64,8 @@ class DataLoader:
     def load_hands(self):
         raw_hands = self.load_raw_hands()
         ranks = self.load_raw_ranks()
-        suits = self.load_raw_suits()
-        hands_pipeline = HandsPipeline(ranks=ranks, suits=suits)
+        shapes = self.load_raw_shapes()
+        hands_pipeline = HandsPipeline(ranks=ranks, shapes=shapes)
         hands = hands_pipeline.fit_transform(raw_hands)
         return hands
 
