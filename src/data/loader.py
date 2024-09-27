@@ -51,7 +51,7 @@ class DataLoader:
 
     def load_combos(self):
         cards = self.load_cards()
-        hands = self.load_raw_hands()
+        hands = self.load_hands()
         raw_combos = self.load_raw_combos()
         combos_pipeline = CombosPipeline(cards=cards, hands=hands)
         combos = combos_pipeline.fit_transform(raw_combos)

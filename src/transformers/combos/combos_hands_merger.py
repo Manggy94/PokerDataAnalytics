@@ -12,6 +12,5 @@ class CombosHandsMerger(BaseEstimator, TransformerMixin):
 
         def transform(self, X: pd.DataFrame):
             return X\
-                .merge(self.hands, how="left", left_on="hand", right_on="id", suffixes=("", "_hand"))\
+                .merge(self.hands, how="left", left_on="hand", right_on="hand_id", suffixes=("", "_hand"))\
                 .drop(columns=["hand_id", "hand"])\
-                .rename(columns={c: f"hand_{c}" for c in self.hands.columns if c !="id"})

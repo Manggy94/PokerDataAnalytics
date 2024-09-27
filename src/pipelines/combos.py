@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from src.transformers.combos.combos_cards_merger import CombosCardsMerger
+from src.transformers.combos.combos_hands_merger import CombosHandsMerger
 
 
 class CombosPipeline(Pipeline):
@@ -9,5 +10,7 @@ class CombosPipeline(Pipeline):
         self.cards = cards
         self.hands = hands
         super().__init__(steps=[
-            ("combos_cards_merger", CombosCardsMerger(cards))
+            ("combos_hands_merger", CombosHandsMerger(hands)),
+            ("combos_cards_merger", CombosCardsMerger(cards)),
+
         ])
