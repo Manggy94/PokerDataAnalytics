@@ -7,7 +7,7 @@ class HandStatsMoveMerger(BaseEstimator, TransformerMixin):
         self.action_moves = action_moves
 
     def fit(self, X, y=None):
-        self.move_columns = [col for col in X.columns if "move_" in col]
+        self.move_columns = [col for col in X.columns if "move" in col]
         return self
 
     def transform(self, X: pd.DataFrame):

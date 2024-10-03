@@ -34,6 +34,11 @@ class DataLoader:
         action_moves = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/action_moves.csv', index_col=0)
         return action_moves
 
+    def load_raw_actions_sequences(self):
+        actions_sequences = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/actions_sequences.csv', index_col=0)
+        return actions_sequences
+
+
     def load_raw_cards(self):
         raw_cards = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/cards.csv', index_col=0)
         return raw_cards
@@ -185,10 +190,12 @@ class DataLoader:
     def load_preflop_player_hand_stats(self):
         raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
         action_moves = self.load_raw_action_moves()
-        combos = self.load_combos()
-        positions = self.load_positions()
-        streets = self.load_raw_streets()
-        pipeline = PreflopPlayerHandStatsPipeline(action_moves=action_moves)
+        sequences = self.load_raw_actions_sequences()
+        # combos = self.load_combos()
+        # positions = self.load_positions()
+        # streets = self.load_raw_streets()
+        pipeline = PreflopPlayerHandStatsPipeline(
+            action_moves=action_moves, sequences=sequences, )
         preflop_player_hand_stats = pipeline.fit_transform(raw_preflop_player_hand_stats)
         return preflop_player_hand_stats
 
