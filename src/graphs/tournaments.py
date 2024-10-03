@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 class TournamentGraphs:
     def __init__(self, tournaments: pd.DataFrame):
         self.tournaments = tournaments
-        self.tournaments_grouped = self.tournaments.groupby(["ref_tournament_buy_in_total", "tournament_type", "speed", "total_players_range"])
+        self.tournaments_grouped = self.tournaments.groupby(["ref_tournament_buy_in_total", "ref_tournament_type", "ref_tournament_speed", "total_players_range"])
         self.tournaments_resume = self.tournaments_grouped\
             .agg(
                 nb_played=("tournament_id", "count"),
@@ -124,7 +124,7 @@ class TournamentGraphs:
 
     def plot_roi_vs_finish_position(self):
         # Filtrer les types de tournois désirés
-        structured_tournaments = self.tournaments[self.tournaments["tournament_type"].isin(["CLASSIC", "KO", "FLIGHT"])]
+        structured_tournaments = self.tournaments[self.tournaments["ref_tournament_type"].isin(["CLASSIC", "KO", "FLIGHT"])]
 
         trace1 = go.Scatter(
             x=structured_tournaments["finish_percentage"],
@@ -189,10 +189,10 @@ class TournamentGraphs:
         fig = px.scatter_3d(
             tournaments_resume,
             x='ref_tournament_buy_in_total',
-            y='tournament_type',
+            y='ref_tournament_type',
             z='mean_roi',
             color='total_players_range',
-            symbol='speed',
+            symbol='ref_tournament_speed',
             title='Mean ROI by categories',
             labels={'ref_tournament_buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'mean_roi': 'Mean ROI'},
             opacity=0.7,
@@ -210,12 +210,12 @@ class TournamentGraphs:
         fig = px.scatter_3d(
             tournaments_resume,
             x='ref_tournament_buy_in_total',
-            y='tournament_type',
+            y='ref_tournament_type',
             z='mean_profit',
             color='total_players_range',
-            symbol='speed',
+            symbol='ref_tournament_speed',
             title='Mean Profit by categories',
-            labels={'ref_tournament_buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'mean_profit': 'Mean Profit'},
+            labels={'ref_tournament_buy_in_total': 'Buy-in total', 'ref_tournament_type': 'Tournament type', 'mean_profit': 'Mean Profit'},
             opacity=0.7,
         )
         fig.update_layout(
@@ -230,12 +230,12 @@ class TournamentGraphs:
         fig = px.scatter_3d(
             tournaments_resume,
             x='ref_tournament_buy_in_total',
-            y='tournament_type',
+            y='ref_tournament_type',
             z='ITM',
             color='total_players_range',
-            symbol='speed',
+            symbol='ref_tournament_speed',
             title='ITM by categories',
-            labels={'ref_tournament_buy_in_total': 'Buy-in total', 'tournament_type': 'Tournament type', 'ITM': 'ITM'},
+            labels={'ref_tournament_buy_in_total': 'Buy-in total', 'ref_tournament_type': 'Tournament type', 'ITM': 'ITM'},
             opacity=0.7,
         )
         fig.update_layout(
