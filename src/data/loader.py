@@ -10,7 +10,7 @@ from src.pipelines.player_hand_stats.preflop import PreflopPlayerHandStatsPipeli
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
-
+from src.pipelines.player_hand_stats import PlayerHandStatsPipeline
 
 
 class DataLoader:
@@ -191,9 +191,6 @@ class DataLoader:
         raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
         action_moves = self.load_raw_action_moves()
         sequences = self.load_raw_actions_sequences()
-        # combos = self.load_combos()
-        # positions = self.load_positions()
-        # streets = self.load_raw_streets()
         pipeline = PreflopPlayerHandStatsPipeline(
             action_moves=action_moves, sequences=sequences, )
         preflop_player_hand_stats = pipeline.fit_transform(raw_preflop_player_hand_stats)
@@ -224,31 +221,32 @@ class DataLoader:
     def load_player_hand_stats(self):
         raw_player_hand_stats = self.load_raw_player_hand_stats()
         hand_histories = self.load_hand_histories()
-        raw_general_player_hand_stats = self.load_raw_general_player_hand_stats()
-        raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
-        raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
-        raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
-        raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
-        # Merge player_hand_stats and hand_histories
-        player_hand_stats = raw_player_hand_stats\
-            .merge(hand_histories, how='left', left_on='hand_history', right_on='id', suffixes=('', '_hand'))\
-            .drop(columns=['id_hand'])
-        # Drop some useless columns
-        columns_to_drop = [ "turn_id", "river_id", "hand_history"]
-        player_hand_stats = player_hand_stats.drop(columns=columns_to_drop)
-        # Merge player_hand_stats and general_player_hand_stats
-        player_hand_stats = player_hand_stats\
-            .merge(raw_general_player_hand_stats, how='right', left_on='general_stats', right_on='general_id',
-                     suffixes=('', '_general'))\
-            .drop(columns=['general_player', 'general_hand_history', 'general_stats', 'general_id'])
-        # Merge player_hand_stats and preflop, flop, turn, river player hand stats
-        player_hand_stats = player_hand_stats\
-            .merge(raw_preflop_player_hand_stats, how='left', left_on='preflop_stats', right_on='preflop_id')\
-            .merge(raw_flop_player_hand_stats, how='left', left_on='flop_stats', right_on='flop_id')\
-            .merge(raw_turn_player_hand_stats, how='left', left_on='turn_stats', right_on='turn_id')\
-            .merge(raw_river_player_hand_stats, how='left', left_on='river_stats', right_on='river_id')\
-            .drop(columns=['preflop_stats', 'preflop_id', 'flop_stats', 'flop_id', 'turn_stats', 'turn_id',
-                           'river_stats', 'river_id'])
+        general_player_hand_stats = self.load_general_player_hand_stats()
+        # raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
+        # raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
+        # raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
+        # raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
+        # # Merge player_hand_stats and hand_histories
+        # # Drop some useless columns
+        # columns_to_drop = [ "turn_id", "river_id", "hand_history"]
+        # player_hand_stats = player_hand_stats.drop(columns=columns_to_drop)
+        # # Merge player_hand_stats and general_player_hand_stats
+        # player_hand_stats = player_hand_stats\
+        #     .merge(raw_general_player_hand_stats, how='right', left_on='general_stats', right_on='general_id',
+        #              suffixes=('', '_general'))\
+        #     .drop(columns=['general_player', 'general_hand_history', 'general_stats', 'general_id'])
+        # # Merge player_hand_stats and preflop, flop, turn, river player hand stats
+        # player_hand_stats = player_hand_stats\
+        #     .merge(raw_preflop_player_hand_stats, how='left', left_on='preflop_stats', right_on='preflop_id')\
+        #     .merge(raw_flop_player_hand_stats, how='left', left_on='flop_stats', right_on='flop_id')\
+        #     .merge(raw_turn_player_hand_stats, how='left', left_on='turn_stats', right_on='turn_id')\
+        #     .merge(raw_river_player_hand_stats, how='left', left_on='river_stats', right_on='river_id')\
+        #     .drop(columns=['preflop_stats', 'preflop_id', 'flop_stats', 'flop_id', 'turn_stats', 'turn_id',
+        #                    'river_stats', 'river_id'])
+        pipeline = PlayerHandStatsPipeline(
+            hand_histories=hand_histories,
+            general_player_hand_stats=general_player_hand_stats,)
+        player_hand_stats = pipeline.fit_transform(raw_player_hand_stats)
         return player_hand_stats
 
     def load_exploitable_hand_stats(self):
