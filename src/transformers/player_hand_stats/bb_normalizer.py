@@ -3,10 +3,16 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class BBNormalizer(BaseEstimator, TransformerMixin):
-    def fit(self, X):
-        self.value_columns = [col for col in X.columns if "stack" in col]
 
-    def transform(self, X):
+    def __init__(self):
+        self.value_columns = None
+        self.keywords = ["stack", "amount", "chips"]
+
+    def fit(self, X: pd.DataFrame, y=None):
+        self.value_columns = [col for col in X.columns if any([keyword in col for keyword in self.keywords])]
+        return self
+
+    def transform(self, X: pd.DataFrame):
         for col in self.value_columns:
-            X[col] = X[col] / X["bb"]
+            X[f"{col}_bb"] = X[col] / X["level_bb"]
         return X
