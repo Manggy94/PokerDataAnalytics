@@ -3,18 +3,16 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class HandStatsStreetMerger(BaseEstimator, TransformerMixin):
+    def __init__(self, street_player_hand_stats: pd.DataFrame, street_name: str):
+        self.street = street_name
+        self.street_player_hand_stats = street_player_hand_stats \
+            .drop(columns=["player", "hand_history"]) \
+            .rename(columns={col: f"{self.street}_{col}" for col in street_player_hand_stats.columns if col != "id"})
 
-        def __init__(self, streets: pd.DataFrame):
-            self.streets = streets
+    def fit(self, X: pd.DataFrame, y=None):
+        return self
 
-        def fit(self, X, y=None):
-            self.street_columns = [col for col in X.columns if "street" in col]
-            return self
-
-        def transform(self, X: pd.DataFrame):
-            for col in self.street_columns:
-                X = X\
-                    .merge(self.streets, how="left", left_on=col, right_on="id", suffixes=("", f"_{col}"))\
-                    .drop(columns=[col, f"id_{col}", "name", "parsing_name", "short_name", "is_preflop"])\
-                    .rename(columns={"symbol": col})
-            return X
+    def transform(self, X: pd.DataFrame):
+        return X\
+            .merge(self.street_player_hand_stats, how="left", left_on=f"{self.street}_stats", right_on="id", suffixes=("", f"_{self.street}"))\
+            .drop(columns=[f"{self.street}_stats", f"id_{self.street}"])

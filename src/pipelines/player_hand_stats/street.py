@@ -4,7 +4,7 @@ from src.transformers.player_hand_stats.player_hand_stats_move_merger import Han
 from src.transformers.player_hand_stats.player_hand_stats_sequence_merger import HandStatsSequenceMerger
 
 
-class PreflopPlayerHandStatsPipeline(Pipeline):
+class StreetPlayerHandStatsPipeline(Pipeline):
     def __init__(self, action_moves: pd.DataFrame, sequences: pd.DataFrame):
         self.action_moves = action_moves
         self.sequences = sequences

@@ -6,7 +6,7 @@ from src.pipelines.flops import FlopsPipeline
 from src.pipelines.hand_histories import HandHistoriesPipeline
 from src.pipelines.hands import HandsPipeline
 from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
-from src.pipelines.player_hand_stats.preflop import PreflopPlayerHandStatsPipeline
+from src.pipelines.player_hand_stats.street import StreetPlayerHandStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
@@ -191,8 +191,8 @@ class DataLoader:
         raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
         action_moves = self.load_raw_action_moves()
         sequences = self.load_raw_actions_sequences()
-        pipeline = PreflopPlayerHandStatsPipeline(
-            action_moves=action_moves, sequences=sequences, )
+        pipeline = StreetPlayerHandStatsPipeline(
+            action_moves=action_moves, sequences=sequences)
         preflop_player_hand_stats = pipeline.fit_transform(raw_preflop_player_hand_stats)
         return preflop_player_hand_stats
 
@@ -203,11 +203,29 @@ class DataLoader:
         flop_player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flop_player_hand_stats.csv', index_col=0)
         return flop_player_hand_stats
 
+    def load_flop_player_hand_stats(self):
+        raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
+        action_moves = self.load_raw_action_moves()
+        sequences = self.load_raw_actions_sequences()
+        pipeline = StreetPlayerHandStatsPipeline(
+            action_moves=action_moves, sequences=sequences)
+        flop_player_hand_stats = pipeline.fit_transform(raw_flop_player_hand_stats)
+        return flop_player_hand_stats
+
     def load_raw_turn_player_hand_stats(self):
         """
         Load turn player hand stats from the database.
         """
         turn_player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/turn_player_hand_stats.csv', index_col=0)
+        return turn_player_hand_stats
+
+    def load_turn_player_hand_stats(self):
+        raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
+        action_moves = self.load_raw_action_moves()
+        sequences = self.load_raw_actions_sequences()
+        pipeline = StreetPlayerHandStatsPipeline(
+            action_moves=action_moves, sequences=sequences)
+        turn_player_hand_stats = pipeline.fit_transform(raw_turn_player_hand_stats)
         return turn_player_hand_stats
 
     def load_raw_river_player_hand_stats(self):
@@ -216,6 +234,15 @@ class DataLoader:
         """
         river_player_hand_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/river_player_hand_stats.csv', index_col=0)
         return river_player_hand_stats
+
+    def load_river_player_hand_stats(self):
+        raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
+        action_moves = self.load_raw_action_moves()
+        sequences = self.load_raw_actions_sequences()
+        pipeline = StreetPlayerHandStatsPipeline(
+            action_moves=action_moves, sequences=sequences)
+        river_player_hand_stats = pipeline.fit_transform(raw_river_player_hand_stats)
+        return river_player_hand_stats
     
 
     def load_player_hand_stats(self):
@@ -223,21 +250,14 @@ class DataLoader:
         hand_histories = self.load_hand_histories()
         general_player_hand_stats = self.load_general_player_hand_stats()
         preflop_player_hand_stats = self.load_preflop_player_hand_stats()
+        flop_player_hand_stats = self.load_flop_player_hand_stats()
+        turn_player_hand_stats = self.load_turn_player_hand_stats()
+        river_player_hand_stats = self.load_river_player_hand_stats()
         # raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
         # raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
         # raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
-        # # Merge player_hand_stats and hand_histories
-        # # Drop some useless columns
-        # columns_to_drop = [ "turn_id", "river_id", "hand_history"]
-        # player_hand_stats = player_hand_stats.drop(columns=columns_to_drop)
-        # # Merge player_hand_stats and general_player_hand_stats
-        # player_hand_stats = player_hand_stats\
-        #     .merge(raw_general_player_hand_stats, how='right', left_on='general_stats', right_on='general_id',
-        #              suffixes=('', '_general'))\
-        #     .drop(columns=['general_player', 'general_hand_history', 'general_stats', 'general_id'])
         # # Merge player_hand_stats and preflop, flop, turn, river player hand stats
         # player_hand_stats = player_hand_stats\
-        #     .merge(raw_preflop_player_hand_stats, how='left', left_on='preflop_stats', right_on='preflop_id')\
         #     .merge(raw_flop_player_hand_stats, how='left', left_on='flop_stats', right_on='flop_id')\
         #     .merge(raw_turn_player_hand_stats, how='left', left_on='turn_stats', right_on='turn_id')\
         #     .merge(raw_river_player_hand_stats, how='left', left_on='river_stats', right_on='river_id')\
@@ -246,7 +266,11 @@ class DataLoader:
         pipeline = PlayerHandStatsPipeline(
             hand_histories=hand_histories,
             general_player_hand_stats=general_player_hand_stats,
-            preflop_player_hand_stats=preflop_player_hand_stats
+            preflop_player_hand_stats=preflop_player_hand_stats,
+            flop_player_hand_stats=flop_player_hand_stats,
+            turn_player_hand_stats=turn_player_hand_stats,
+            river_player_hand_stats=river_player_hand_stats
+
         )
         player_hand_stats = pipeline.fit_transform(raw_player_hand_stats)
         return player_hand_stats

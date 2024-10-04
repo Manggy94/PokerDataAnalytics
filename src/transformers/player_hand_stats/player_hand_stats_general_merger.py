@@ -4,7 +4,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 class HandStatsGeneralMerger(BaseEstimator, TransformerMixin):
     def __init__(self, general_player_hand_stats: pd.DataFrame):
-        self.general_player_hand_stats = general_player_hand_stats
+        self.general_player_hand_stats = general_player_hand_stats\
+            .drop(columns=["player", "hand_history"])\
 
     def fit(self, X, y=None):
         return self

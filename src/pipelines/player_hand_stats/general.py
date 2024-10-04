@@ -5,7 +5,7 @@ from src.transformers.player_hand_stats.general.na_dropper import NaDropper
 from src.transformers.player_hand_stats.general.positions_merger import PositionsMerger
 from src.transformers.player_hand_stats.general.seats_categorizer import SeatsCategorizer
 from src.transformers.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
-from src.transformers.player_hand_stats.player_hand_stats_street_merger import HandStatsStreetMerger
+from src.transformers.player_hand_stats.player_hand_stats_action_street_merger import HandStatsActionStreetMerger
 
 class GeneralPlayerHandStatsPipeline(Pipeline):
 
@@ -19,6 +19,6 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
             ("seats_categorizer", SeatsCategorizer()),
             ("combos_merger", CombosMerger(combos)),
             ("positions_merger", PositionsMerger(positions)),
-            ("hand_stats_street_merger", HandStatsStreetMerger(streets)),
+            ("hand_stats_street_merger", HandStatsActionStreetMerger(streets)),
             ("hand_stats_move_merger", HandStatsMoveMerger(action_moves)),
         ])
