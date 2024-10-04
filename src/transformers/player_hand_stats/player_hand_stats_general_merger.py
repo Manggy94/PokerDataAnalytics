@@ -12,5 +12,4 @@ class HandStatsGeneralMerger(BaseEstimator, TransformerMixin):
     def transform(self, X: pd.DataFrame):
         return X\
             .merge(self.general_player_hand_stats, how="left", left_on="general_stats", right_on="id", suffixes=("", "_general"))\
-            # .drop(columns=["hand_history", f"id_hand_history"])\
-            # .rename(columns={"symbol": col})
+            .drop(columns=["general_stats", "id_general"])

@@ -222,7 +222,7 @@ class DataLoader:
         raw_player_hand_stats = self.load_raw_player_hand_stats()
         hand_histories = self.load_hand_histories()
         general_player_hand_stats = self.load_general_player_hand_stats()
-        # raw_preflop_player_hand_stats = self.load_raw_preflop_player_hand_stats()
+        preflop_player_hand_stats = self.load_preflop_player_hand_stats()
         # raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
         # raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
         # raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
@@ -245,7 +245,9 @@ class DataLoader:
         #                    'river_stats', 'river_id'])
         pipeline = PlayerHandStatsPipeline(
             hand_histories=hand_histories,
-            general_player_hand_stats=general_player_hand_stats,)
+            general_player_hand_stats=general_player_hand_stats,
+            preflop_player_hand_stats=preflop_player_hand_stats
+        )
         player_hand_stats = pipeline.fit_transform(raw_player_hand_stats)
         return player_hand_stats
 

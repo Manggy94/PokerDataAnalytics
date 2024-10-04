@@ -12,7 +12,6 @@ class HandStatsSequenceMerger(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        print(self.sequences)
         for col in self.sequence_columns:
             X = X\
                 .merge(self.sequences, how="left", left_on=col, right_on="id", suffixes=("", f"_{col}"))\
