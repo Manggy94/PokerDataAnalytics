@@ -2,9 +2,9 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from src.transformers.player_hand_stats.player_hand_stats_hand_history_merger import HandStatsHandHistoryMerger
 from src.transformers.player_hand_stats.player_hand_stats_general_merger import HandStatsGeneralMerger
-from src.transformers.player_hand_stats.player_hand_stats_preflop_merger import HandStatsPreflopMerger
 from src.transformers.player_hand_stats.player_hand_stats_street_merger import HandStatsStreetMerger
 from src.transformers.player_hand_stats.bb_normalizer import BBNormalizer
+from src.transformers.boolean_converter import BooleanConverter
 
 class PlayerHandStatsPipeline(Pipeline):
     def __init__(
@@ -28,5 +28,6 @@ class PlayerHandStatsPipeline(Pipeline):
             ("hand_stats_flop_merger", HandStatsStreetMerger(flop_player_hand_stats, "flop")),
             ("hand_stats_turn_merger", HandStatsStreetMerger(turn_player_hand_stats, "turn")),
             ("hand_stats_river_merger", HandStatsStreetMerger(river_player_hand_stats, "river")),
+            ("boolean_converter", BooleanConverter()),
             ("bb_normalizer", BBNormalizer())
         ])

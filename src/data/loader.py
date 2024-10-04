@@ -253,16 +253,6 @@ class DataLoader:
         flop_player_hand_stats = self.load_flop_player_hand_stats()
         turn_player_hand_stats = self.load_turn_player_hand_stats()
         river_player_hand_stats = self.load_river_player_hand_stats()
-        # raw_flop_player_hand_stats = self.load_raw_flop_player_hand_stats()
-        # raw_turn_player_hand_stats = self.load_raw_turn_player_hand_stats()
-        # raw_river_player_hand_stats = self.load_raw_river_player_hand_stats()
-        # # Merge player_hand_stats and preflop, flop, turn, river player hand stats
-        # player_hand_stats = player_hand_stats\
-        #     .merge(raw_flop_player_hand_stats, how='left', left_on='flop_stats', right_on='flop_id')\
-        #     .merge(raw_turn_player_hand_stats, how='left', left_on='turn_stats', right_on='turn_id')\
-        #     .merge(raw_river_player_hand_stats, how='left', left_on='river_stats', right_on='river_id')\
-        #     .drop(columns=['preflop_stats', 'preflop_id', 'flop_stats', 'flop_id', 'turn_stats', 'turn_id',
-        #                    'river_stats', 'river_id'])
         pipeline = PlayerHandStatsPipeline(
             hand_histories=hand_histories,
             general_player_hand_stats=general_player_hand_stats,

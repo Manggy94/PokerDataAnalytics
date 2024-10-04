@@ -14,5 +14,6 @@ class BBNormalizer(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         for col in self.value_columns:
+            X = X.copy()
             X[f"{col}_bb"] = X[col] / X["level_bb"]
         return X

@@ -6,6 +6,10 @@ from src.transformers.player_hand_stats.general.positions_merger import Position
 from src.transformers.player_hand_stats.general.seats_categorizer import SeatsCategorizer
 from src.transformers.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
 from src.transformers.player_hand_stats.player_hand_stats_action_street_merger import HandStatsActionStreetMerger
+from src.transformers.boolean_converter import BooleanConverter
+from src.transformers.float_converter import FloatConverter
+from src.transformers.int_converter import IntConverter
+from src.transformers.objects_categorizer import ObjectsCategorizer
 
 class GeneralPlayerHandStatsPipeline(Pipeline):
 
@@ -21,4 +25,8 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
             ("positions_merger", PositionsMerger(positions)),
             ("hand_stats_street_merger", HandStatsActionStreetMerger(streets)),
             ("hand_stats_move_merger", HandStatsMoveMerger(action_moves)),
+            ("boolean_converter", BooleanConverter()),
+            ("int_converter", IntConverter()),
+            ("float_converter", FloatConverter()),
+            ("objects_categorizer", ObjectsCategorizer())
         ])
