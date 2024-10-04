@@ -285,8 +285,11 @@ class DataLoader:
 
     def load_raw_general_player_stats(self):
         general_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/general_player_stats.csv', index_col=0)
-        general_player_stats = general_player_stats.rename(columns={x: f"general_{x}" for x in general_player_stats.columns})
         return general_player_stats
+
+    def load_general_player_stats(self):
+        raw_player_stats = self.load_raw_general_player_stats()
+        return raw_player_stats
 
     def load_raw_preflop_player_stats(self):
         preflop_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/preflop_player_stats.csv', index_col=0)

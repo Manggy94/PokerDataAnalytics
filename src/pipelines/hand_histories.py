@@ -6,6 +6,7 @@ from src.transformers.hand_histories.hand_histories_flops_merger import HandHist
 from src.transformers.hand_histories.hand_histories_levels_merger import HandHistoriesLevelsMerger
 from src.transformers.hand_histories.hand_histories_river_merger import HandHistoriesRiverMerger
 from src.transformers.hand_histories.hand_histories_turn_merger import HandHistoriesTurnMerger
+from src.transformers.hand_histories.hand_id_dropper import HandIdDropper
 from src.transformers.boolean_converter import BooleanConverter
 from src.transformers.float_converter import FloatConverter
 from src.transformers.int_converter import IntConverter
@@ -23,6 +24,7 @@ class HandHistoriesPipeline(Pipeline):
         self.combos = combos
         self.cards = cards
         super().__init__(steps=[
+            ("hand_id_dropper", HandIdDropper()),
             ("hand_date_type_corrector", HandDateTypeCorrector()),
             ("hand_histories_levels_merger", HandHistoriesLevelsMerger(levels)),
             ("hand_histories_combos_merger", HandHistoriesCombosMerger(combos)),
