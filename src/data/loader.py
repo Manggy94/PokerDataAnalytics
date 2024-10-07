@@ -9,6 +9,7 @@ from src.pipelines.player_hand_stats import PlayerHandStatsPipeline
 from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
 from src.pipelines.player_hand_stats.street import StreetPlayerHandStatsPipeline
 from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
+from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
 from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
@@ -297,7 +298,13 @@ class DataLoader:
 
     def load_raw_preflop_player_stats(self):
         preflop_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/preflop_player_stats.csv', index_col=0)
-        preflop_player_stats = preflop_player_stats.rename(columns={x: f"preflop_{x}" for x in preflop_player_stats.columns})
+        return preflop_player_stats
+
+    def load_preflop_player_stats(self):
+        raw_player_stats = self.load_raw_player_stats()
+        raw_preflop_player_stats = self.load_raw_preflop_player_stats()
+        pipeline = PreflopPlayerStatsPipeline(preflop_stats=raw_preflop_player_stats)
+        preflop_player_stats = pipeline.fit_transform(raw_player_stats)
         return preflop_player_stats
 
     def load_raw_flop_player_stats(self):
