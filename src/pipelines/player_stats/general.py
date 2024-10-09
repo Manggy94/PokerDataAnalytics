@@ -6,10 +6,10 @@ from src.transformers.player_stats.player_stats_general_merger import PlayerStat
 from src.transformers.float_converter import FloatConverter
 
 class GeneralPlayerStatsPipeline(Pipeline):
-    def __init__(self, general_player_stats: pd.DataFrame):
-        self.general_player_stats = general_player_stats
+    def __init__(self, general_stats: pd.DataFrame):
+        self.general_stats = general_stats
         super().__init__(steps=[
-            ("general_stats_merger", PlayerStatsGeneralMerger(general_player_stats)),
+            ("general_stats_merger", PlayerStatsGeneralMerger(general_stats)),
             ("int_converter", IntConverter()),
             ("general_ratios_calculator", GeneralRatiosCalculator()),
             ("float_converter", FloatConverter())

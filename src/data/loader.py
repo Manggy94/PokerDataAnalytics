@@ -8,6 +8,7 @@ from src.pipelines.hands import HandsPipeline
 from src.pipelines.player_hand_stats import PlayerHandStatsPipeline
 from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
 from src.pipelines.player_hand_stats.street import StreetPlayerHandStatsPipeline
+from src.pipelines.player_stats import PlayerStatsPipeline
 from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
 from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
@@ -292,7 +293,7 @@ class DataLoader:
     def load_general_player_stats(self):
         raw_player_stats = self.load_raw_player_stats()
         raw_general_player_stats = self.load_raw_general_player_stats()
-        pipeline = GeneralPlayerStatsPipeline(general_player_stats=raw_general_player_stats)
+        pipeline = GeneralPlayerStatsPipeline(general_stats=raw_general_player_stats)
         general_player_stats = pipeline.fit_transform(raw_player_stats)
         return general_player_stats
 
@@ -324,17 +325,14 @@ class DataLoader:
 
     def load_player_stats(self):
         raw_player_stats = self.load_raw_player_stats()
-        # general_player_stats = self.load_raw_general_player_stats()
-        # preflop_player_stats = self.load_raw_preflop_player_stats()
-        # flop_player_stats = self.load_raw_flop_player_stats()
-        # turn_player_stats = self.load_raw_turn_player_stats()
-        # river_player_stats = self.load_raw_river_player_stats()
-        # player_stats = raw_player_stats\
-        #     .merge(general_player_stats, how='left', left_on='general_stats', right_on='general_id', suffixes=('', '_general'))\
-        #     .merge(preflop_player_stats, how='left', left_on='preflop_stats', right_on='preflop_id', suffixes=('', '_preflop'))\
-        #     .merge(flop_player_stats, how='left', left_on='flop_stats', right_on='flop_id', suffixes=('', '_flop'))\
-        #     .merge(turn_player_stats, how='left', left_on='turn_stats', right_on='turn_id', suffixes=('', '_turn'))\
-        #     .merge(river_player_stats, how='left', left_on='river_stats', right_on='river_id', suffixes=('', '_river'))
-        # player_stats = player_stats.rename(columns={x: f"player_{x}" for x in player_stats.columns})
-        # return player_stats
-        return raw_player_stats
+        general_stats = self.load_raw_general_player_stats()
+        preflop_stats = self.load_raw_preflop_player_stats()
+        flop_stats = self.load_raw_flop_player_stats()
+        turn_stats = self.load_raw_turn_player_stats()
+        river_stats = self.load_raw_river_player_stats()
+        pipeline = PlayerStatsPipeline(
+            general_stats=general_stats,
+            preflop_stats=preflop_stats
+        )
+        player_stats = pipeline.fit_transform(raw_player_stats)
+        return player_stats
