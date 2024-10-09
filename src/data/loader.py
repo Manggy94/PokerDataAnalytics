@@ -10,6 +10,7 @@ from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeli
 from src.pipelines.player_hand_stats.street import StreetPlayerHandStatsPipeline
 from src.pipelines.player_stats import PlayerStatsPipeline
 from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
+from src.pipelines.player_stats.postflop import PostflopPlayerStatsPipeline
 from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
 from src.pipelines.ref_tournaments import RefTournamentPipeline
 from src.pipelines.tournaments import TournamentsPipeline
@@ -310,18 +311,28 @@ class DataLoader:
 
     def load_raw_flop_player_stats(self):
         flop_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flop_player_stats.csv', index_col=0)
-        flop_player_stats = flop_player_stats.rename(columns={x: f"flop_{x}" for x in flop_player_stats.columns})
         return flop_player_stats
 
     def load_raw_turn_player_stats(self):
         turn_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/turn_player_stats.csv', index_col=0)
-        turn_player_stats = turn_player_stats.rename(columns={x: f"turn_{x}" for x in turn_player_stats.columns})
         return turn_player_stats
 
     def load_raw_river_player_stats(self):
         river_player_stats = pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/river_player_stats.csv', index_col=0)
-        river_player_stats = river_player_stats.rename(columns={x: f"river_{x}" for x in river_player_stats.columns})
         return river_player_stats
+
+    def load_postflop_player_stats(self):
+        raw_player_stats = self.load_raw_player_stats()
+        flop_stats = self.load_raw_flop_player_stats()
+        turn_stats = self.load_raw_turn_player_stats()
+        river_stats = self.load_raw_river_player_stats()
+        pipeline = PostflopPlayerStatsPipeline(
+            flop_stats=flop_stats,
+            turn_stats=turn_stats,
+            river_stats=river_stats
+        )
+        player_stats = pipeline.fit_transform(raw_player_stats)
+        return player_stats
 
     def load_player_stats(self):
         raw_player_stats = self.load_raw_player_stats()
@@ -332,7 +343,10 @@ class DataLoader:
         river_stats = self.load_raw_river_player_stats()
         pipeline = PlayerStatsPipeline(
             general_stats=general_stats,
-            preflop_stats=preflop_stats
+            preflop_stats=preflop_stats,
+            flop_stats=flop_stats,
+            turn_stats=turn_stats,
+            river_stats=river_stats
         )
         player_stats = pipeline.fit_transform(raw_player_stats)
         return player_stats
