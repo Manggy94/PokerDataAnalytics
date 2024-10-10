@@ -3,6 +3,7 @@ from sklearn.pipeline import Pipeline
 
 from src.transformers.player_stats.int_converter import IntConverter
 from src.transformers.player_stats.player_stats_street_merger import PlayerStatsStreetMerger
+from src.transformers.player_stats.postflop_ratios_calculator import PostflopRatiosCalculator
 
 
 class PostflopPlayerStatsPipeline(Pipeline):
@@ -20,5 +21,7 @@ class PostflopPlayerStatsPipeline(Pipeline):
             ("turn_stats_merger", PlayerStatsStreetMerger(street_stats=turn_stats, street_name="turn")),
             ("river_stats_merger", PlayerStatsStreetMerger(street_stats=river_stats, street_name="river")),
             ("int_converter", IntConverter()),
-            # ("postflop_ratios_calculator", PostflopRatiosCalculator())
+            ("flop_ratios_calculator", PostflopRatiosCalculator("flop")),
+            ("turn_ratios_calculator", PostflopRatiosCalculator("turn")),
+            ("river_ratios_calculator", PostflopRatiosCalculator("river"))
         ])

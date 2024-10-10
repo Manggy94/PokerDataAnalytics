@@ -17,6 +17,7 @@ class PreflopRatiosCalculator(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
+        X = X.copy()
         for num_col, denum_col, stat_name in zip(self.num_cols, self.denum_cols, self.stat_names):
             X[stat_name] = (X[num_col] / X[denum_col]).fillna(0).replace(np.inf, 1).astype("float16")
         return X

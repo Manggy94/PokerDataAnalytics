@@ -11,6 +11,7 @@ class GeneralRatiosCalculator(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
+        X = X.copy()
         X["went_to_showdown_ratio"] = X["cnt_went_to_showdown"] / X["cnt_hands_played"]
         X["won_hand_ratio"] = X["cnt_won_hand"] / X["cnt_hands_played"]
         X["confidence_ratio"] = 1-1/np.sqrt(X["cnt_hands_played"])

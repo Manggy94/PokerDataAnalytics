@@ -2,8 +2,10 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from src.transformers.player_stats.general_ratios_calculator import GeneralRatiosCalculator
 from src.transformers.player_stats.int_converter import IntConverter
+from src.transformers.player_stats.player_id_dropper import PlayerIdDropper
 from src.transformers.player_stats.player_stats_general_merger import PlayerStatsGeneralMerger
 from src.transformers.player_stats.player_stats_street_merger import PlayerStatsStreetMerger
+from src.transformers.player_stats.postflop_ratios_calculator import PostflopRatiosCalculator
 from src.transformers.player_stats.preflop_ratios_calculator import PreflopRatiosCalculator
 
 class PlayerStatsPipeline(Pipeline):
@@ -27,7 +29,11 @@ class PlayerStatsPipeline(Pipeline):
             ("preflop_stats_merger", PlayerStatsStreetMerger(street_stats=preflop_stats, street_name="preflop")),
             ("preflop_ratios_calculator", PreflopRatiosCalculator()),
             ("flop_stats_merger", PlayerStatsStreetMerger(street_stats=flop_stats, street_name="flop")),
+            ("flop_ratios_calculator", PostflopRatiosCalculator("flop")),
             ("turn_stats_merger", PlayerStatsStreetMerger(street_stats=turn_stats, street_name="turn")),
+            ("turn_ratios_calculator", PostflopRatiosCalculator("turn")),
             ("river_stats_merger", PlayerStatsStreetMerger(street_stats=river_stats, street_name="river")),
-            ("int_converter", IntConverter())
+            ("river_ratios_calculator", PostflopRatiosCalculator("river")),
+            ("int_converter", IntConverter()),
+            ('player_id_dropper', PlayerIdDropper())
         ])
