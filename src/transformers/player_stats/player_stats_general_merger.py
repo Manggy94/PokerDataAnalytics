@@ -15,4 +15,4 @@ class PlayerStatsGeneralMerger(BaseEstimator, TransformerMixin):
         return X\
             .dropna(subset=["id"])\
             .merge(self.player_general_stats, how="left", left_on="general_stats", right_on="id", suffixes=("", "_general_stats"))\
-            .drop(columns=["id_general_stats", "general_stats"])\
+            .drop(columns=["id_general_stats", "general_stats", "player_general_stats"])\

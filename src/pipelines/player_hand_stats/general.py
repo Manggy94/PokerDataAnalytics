@@ -13,7 +13,14 @@ from src.transformers.objects_categorizer import ObjectsCategorizer
 
 class GeneralPlayerHandStatsPipeline(Pipeline):
 
-    def __init__(self, positions: pd.DataFrame, combos: pd.DataFrame, streets: pd.DataFrame, action_moves: pd.DataFrame):
+    def __init__(
+            self,
+            action_moves: pd.DataFrame,
+            combos: pd.DataFrame,
+            positions: pd.DataFrame,
+            streets: pd.DataFrame,
+
+    ):
         self.action_moves = action_moves
         self.combos = combos
         self.positions = positions

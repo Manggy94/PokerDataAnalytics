@@ -13,16 +13,20 @@ from src.transformers.int_converter import IntConverter
 from src.transformers.objects_categorizer import ObjectsCategorizer
 
 
-
-
 class HandHistoriesPipeline(Pipeline):
 
 
-    def __init__(self, levels: pd.DataFrame, flops: pd.DataFrame, cards:pd.DataFrame, combos: pd.DataFrame):
-        self.levels = levels
-        self.flops = flops
-        self.combos = combos
+    def __init__(
+            self,
+            cards: pd.DataFrame,
+            combos: pd.DataFrame,
+            flops: pd.DataFrame,
+            levels: pd.DataFrame,
+    ):
         self.cards = cards
+        self.combos = combos
+        self.flops = flops
+        self.levels = levels
         super().__init__(steps=[
             ("hand_id_dropper", HandIdDropper()),
             ("hand_date_type_corrector", HandDateTypeCorrector()),
@@ -35,5 +39,4 @@ class HandHistoriesPipeline(Pipeline):
             ("int_converter", IntConverter()),
             ("float_converter", FloatConverter()),
             ("objects_categorizer", ObjectsCategorizer())
-
         ])

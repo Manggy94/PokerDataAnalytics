@@ -6,7 +6,11 @@ from src.transformers.combos.combos_hands_merger import CombosHandsMerger
 
 class CombosPipeline(Pipeline):
 
-    def __init__(self, cards: pd.DataFrame, hands: pd.DataFrame):
+    def __init__(
+            self,
+            cards: pd.DataFrame = None,
+            hands: pd.DataFrame = None
+    ):
         self.cards = cards
         self.hands = hands
         super().__init__(steps=[

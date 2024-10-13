@@ -12,5 +12,5 @@ class FloatConverter(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        X[self.float_columns] = X[self.float_columns].astype("float32")
+        X[self.float_columns] = X[self.float_columns].astype("float16")
         return X

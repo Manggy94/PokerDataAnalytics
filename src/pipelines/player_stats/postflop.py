@@ -9,17 +9,17 @@ from src.transformers.player_stats.postflop_ratios_calculator import PostflopRat
 class PostflopPlayerStatsPipeline(Pipeline):
     def __init__(
             self,
-            flop_stats: pd.DataFrame,
-            turn_stats: pd.DataFrame,
-            river_stats: pd.DataFrame
+            raw_flop_player_stats: pd.DataFrame,
+            raw_turn_player_stats: pd.DataFrame,
+            raw_river_player_stats: pd.DataFrame
     ):
-        self.flop_stats = flop_stats
-        self.turn_stats = turn_stats
-        self.river_stats = river_stats
+        self.raw_flop_player_stats = raw_flop_player_stats
+        self.raw_turn_player_stats = raw_turn_player_stats
+        self.raw_river_player_stats = raw_river_player_stats
         super().__init__(steps=[
-            ("flop_stats_merger", PlayerStatsStreetMerger(street_stats=flop_stats, street_name="flop")),
-            ("turn_stats_merger", PlayerStatsStreetMerger(street_stats=turn_stats, street_name="turn")),
-            ("river_stats_merger", PlayerStatsStreetMerger(street_stats=river_stats, street_name="river")),
+            ("flop_stats_merger", PlayerStatsStreetMerger(street_stats=raw_flop_player_stats, street_name="flop")),
+            ("turn_stats_merger", PlayerStatsStreetMerger(street_stats=raw_turn_player_stats, street_name="turn")),
+            ("river_stats_merger", PlayerStatsStreetMerger(street_stats=raw_river_player_stats, street_name="river")),
             ("int_converter", IntConverter()),
             ("flop_ratios_calculator", PostflopRatiosCalculator("flop")),
             ("turn_ratios_calculator", PostflopRatiosCalculator("turn")),

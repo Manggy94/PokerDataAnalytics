@@ -1,39 +1,35 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.transformers.player_stats.general_ratios_calculator import GeneralRatiosCalculator
-from src.transformers.player_stats.int_converter import IntConverter
+from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
+from src.pipelines.player_stats.postflop import PostflopPlayerStatsPipeline
+from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
 from src.transformers.player_stats.player_id_dropper import PlayerIdDropper
-from src.transformers.player_stats.player_stats_general_merger import PlayerStatsGeneralMerger
-from src.transformers.player_stats.player_stats_street_merger import PlayerStatsStreetMerger
-from src.transformers.player_stats.postflop_ratios_calculator import PostflopRatiosCalculator
-from src.transformers.player_stats.preflop_ratios_calculator import PreflopRatiosCalculator
 
 class PlayerStatsPipeline(Pipeline):
 
     def __init__(
             self,
-            general_stats: pd.DataFrame,
-            preflop_stats: pd.DataFrame,
-            flop_stats: pd.DataFrame,
-            turn_stats: pd.DataFrame,
-            river_stats: pd.DataFrame
+            raw_general_player_stats: pd.DataFrame,
+            raw_preflop_player_stats: pd.DataFrame,
+            raw_flop_player_stats: pd.DataFrame,
+            raw_turn_player_stats: pd.DataFrame,
+            raw_river_player_stats: pd.DataFrame
     ):
-        self.general_stats = general_stats
-        self.preflop_stats = preflop_stats
-        self.flop_stats = flop_stats
-        self.turn_stats = turn_stats
-        self.river_stats = river_stats
+        self.raw_general_player_stats = raw_general_player_stats
+        self.raw_preflop_player_stats = raw_preflop_player_stats
+        self.raw_flop_player_stats = raw_flop_player_stats
+        self.raw_turn_player_stats = raw_turn_player_stats
+        self.raw_river_player_stats = raw_river_player_stats
         super().__init__(steps=[
-            ("general_stats_merger", PlayerStatsGeneralMerger(player_general_stats=general_stats)),
-            ("general_ratios_calculator", GeneralRatiosCalculator()),
-            ("preflop_stats_merger", PlayerStatsStreetMerger(street_stats=preflop_stats, street_name="preflop")),
-            ("preflop_ratios_calculator", PreflopRatiosCalculator()),
-            ("flop_stats_merger", PlayerStatsStreetMerger(street_stats=flop_stats, street_name="flop")),
-            ("flop_ratios_calculator", PostflopRatiosCalculator("flop")),
-            ("turn_stats_merger", PlayerStatsStreetMerger(street_stats=turn_stats, street_name="turn")),
-            ("turn_ratios_calculator", PostflopRatiosCalculator("turn")),
-            ("river_stats_merger", PlayerStatsStreetMerger(street_stats=river_stats, street_name="river")),
-            ("river_ratios_calculator", PostflopRatiosCalculator("river")),
-            ("int_converter", IntConverter()),
+            ("general_player_stats_pipeline", GeneralPlayerStatsPipeline(
+                raw_general_player_stats=raw_general_player_stats)),
+            ("preflop_player_stats_pipeline", PreflopPlayerStatsPipeline(
+                raw_preflop_player_stats=raw_preflop_player_stats)
+             ),
+            ("postflop_player_stats_pipeline", PostflopPlayerStatsPipeline(
+                raw_flop_player_stats=raw_flop_player_stats,
+                raw_turn_player_stats=raw_turn_player_stats,
+                raw_river_player_stats=raw_river_player_stats)
+             ),
             ('player_id_dropper', PlayerIdDropper())
         ])

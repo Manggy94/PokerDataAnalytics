@@ -5,8 +5,11 @@ from src.transformers.hands.hands_shapes_merger import HandsShapesMerger
 
 
 class HandsPipeline(Pipeline):
-
-    def __init__(self, ranks: pd.DataFrame, shapes: pd.DataFrame):
+    def __init__(
+            self,
+            ranks: pd.DataFrame = None,
+            shapes: pd.DataFrame = None
+    ):
         self.ranks = ranks
         self.shapes = shapes
         super().__init__(steps=[

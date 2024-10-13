@@ -6,10 +6,10 @@ from src.transformers.player_stats.preflop_ratios_calculator import PreflopRatio
 
 
 class PreflopPlayerStatsPipeline(Pipeline):
-    def __init__(self, preflop_stats: pd.DataFrame):
-        self.preflop_stats = preflop_stats
+    def __init__(self, raw_preflop_player_stats: pd.DataFrame):
+        self.raw_preflop_player_stats = raw_preflop_player_stats
         super().__init__(steps=[
-            ("preflop_stats_merger", PlayerStatsStreetMerger(street_stats=preflop_stats, street_name="preflop")),
+            ("raw_preflop_player_stats_merger", PlayerStatsStreetMerger(street_stats=raw_preflop_player_stats, street_name="preflop")),
             ("int_converter", IntConverter()),
             ("preflop_ratios_calculator", PreflopRatiosCalculator())
         ])

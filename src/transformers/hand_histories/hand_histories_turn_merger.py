@@ -11,7 +11,9 @@ class HandHistoriesTurnMerger(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        return X\
+
+        X =  X\
             .merge(self.cards, how="left", left_on="turn", right_on="id", suffixes=("", "_turn")) \
             .drop(columns=["id_turn", "turn", "name", "symbol"])\
             .rename(columns={c: f"turn_card_{c}" for c in self.cards.columns if c != "id"})
+        return X

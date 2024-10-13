@@ -11,6 +11,7 @@ class HandHistoriesFlopsMerger(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        return X\
+        X = X\
             .merge(self.flops, how="left", left_on="flop", right_on="id", suffixes=("", "_flop"))\
             .drop(columns=["id_flop", "flop"])
+        return X

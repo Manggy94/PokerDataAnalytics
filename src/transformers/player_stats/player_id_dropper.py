@@ -10,4 +10,3 @@ class PlayerIdDropper(BaseEstimator, TransformerMixin):
     def transform(self, X: pd.DataFrame):
         return X\
             .drop(columns='id')\
-            .rename(columns={'name': 'player_name', 'player': 'player_id'})
