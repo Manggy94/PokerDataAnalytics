@@ -20,4 +20,6 @@ class CombosCardsMerger(BaseEstimator, TransformerMixin):
             .merge(first_cards, how='left', left_on='first_card', right_on='id', suffixes=('', '_card1'))\
             .drop(columns=['id_card1', 'first_card'])\
             .merge(second_cards, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))\
-            .drop(columns=['id_card2', 'second_card'])
+            .drop(columns=['id_card2', 'second_card'])\
+            .rename(columns={"first_card_short_name": "first_card",
+                             "second_card_short_name": "second_card"})

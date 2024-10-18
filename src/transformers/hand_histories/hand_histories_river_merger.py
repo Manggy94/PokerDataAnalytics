@@ -14,5 +14,6 @@ class HandHistoriesRiverMerger(BaseEstimator, TransformerMixin):
         X =  X\
             .merge(self.cards, how="left", left_on="river", right_on="id", suffixes=("", "_river")) \
             .drop(columns=["id_river", "river", "name", "symbol"])\
-            .rename(columns={c: f"river_card_{c}" for c in self.cards.columns if c != "id"})
+            .rename(columns={c: f"river_card_{c}" for c in self.cards.columns if c != "id"})\
+            .rename(columns={"river_card_short_name": "river_card"})
         return X

@@ -23,5 +23,6 @@ class PlayerStatsLoader(Pipeline):
                 raw_flop_player_stats=RawFlopPlayerStatsLoader().fit_transform(None),
                 raw_turn_player_stats=RawTurnPlayerStatsLoader().fit_transform(None),
                 raw_river_player_stats=RawRiverPlayerStatsLoader().fit_transform(None)
+
             ))
         ])

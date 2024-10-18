@@ -5,6 +5,7 @@ from src.transformers.player_hand_stats.player_hand_stats_sequence_merger import
 from src.transformers.boolean_converter import BooleanConverter
 from src.transformers.float_converter import FloatConverter
 from src.transformers.int_converter import IntConverter
+from src.transformers.na_bool_filler import NaBoolFiller
 from src.transformers.objects_categorizer import ObjectsCategorizer
 
 
@@ -16,6 +17,7 @@ class StreetPlayerHandStatsPipeline(Pipeline):
             ("hand_stats_move_merger", HandStatsMoveMerger(action_moves)),
             ("hand_stats_sequence_merger", HandStatsSequenceMerger(sequences)),
             ("boolean_converter", BooleanConverter()),
+            ("na_bool_filler", NaBoolFiller()),
             ("int_converter", IntConverter()),
             ("float_converter", FloatConverter()),
             ("objects_categorizer", ObjectsCategorizer())

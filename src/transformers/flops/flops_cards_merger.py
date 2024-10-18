@@ -19,4 +19,7 @@ class FlopsCardsMerger(BaseEstimator, TransformerMixin):
             .merge(cards2, how='left', left_on='second_card', right_on='id', suffixes=('', '_card2'))\
             .drop(columns=['id_card2', 'second_card'])\
             .merge(cards3, how='left', left_on='third_card', right_on='id', suffixes=('', '_card3'))\
-            .drop(columns=['id_card3', 'third_card'])
+            .drop(columns=['id_card3', 'third_card'])\
+            .rename(columns={"first_card_short_name": "first_card",
+                             "second_card_short_name": "second_card",
+                             "third_card_short_name": "third_card"})

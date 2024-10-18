@@ -7,7 +7,7 @@ class IntConverter(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.int_8_columns = None
         self.int_32_columns = None
-        self.int_8_keywords = ["nb_"]
+        self.int_8_keywords = ["nb_", "level_value"]
         self.int_32_keywords = ["total_players", "final_position", "starting_stack"]
 
     def fit(self, X: pd.DataFrame, y=None):

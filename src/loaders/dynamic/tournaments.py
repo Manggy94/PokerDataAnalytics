@@ -4,7 +4,7 @@ from src.loaders.dynamic.ref_tournaments import RefTournamentsLoader
 from src.pipelines.tournaments import TournamentsPipeline
 
 
-class TournamentLoader(Pipeline):
+class TournamentsLoader(Pipeline):
     def __init__(self):
         super().__init__(steps=[
             ("raw_tournaments_loader", RawTournamentsLoader()),

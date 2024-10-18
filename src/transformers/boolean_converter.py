@@ -8,9 +8,11 @@ class BooleanConverter(BaseEstimator, TransformerMixin):
         self.boolean_keywords = ["flag", "is_", "has_"]
 
     def fit(self, X, y=None):
-        self.boolean_columns = [col for col in X.columns if any(keyword in col for keyword in self.boolean_keywords)]
+        self.boolean_columns = [col for col in X.columns
+                                if any(keyword in col for keyword in self.boolean_keywords) and "ratio" not in col]
         return self
 
     def transform(self, X: pd.DataFrame):
-        X[self.boolean_columns] = X[self.boolean_columns].astype(bool)
+        X[self.boolean_columns] = X[self.boolean_columns].astype('bool')
+        X[self.boolean_columns] = X[self.boolean_columns].astype(pd.BooleanDtype())
         return X

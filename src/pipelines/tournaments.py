@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
+from src.transformers.float_converter import FloatConverter as GlobalFloatConverter
 from src.transformers.objects_categorizer import ObjectsCategorizer
 from src.transformers.tournaments.start_date_type_corrector import StartDateTypeCorrector
 from src.transformers.tournaments.final_position_imputer import FinalPositionImputer
@@ -22,6 +23,8 @@ class TournamentsPipeline(Pipeline):
             ("total_players_splitter", TotalPlayersSplitter()),
             ("profits_calculator", ProfitsCalculator()),
             ("float_converter", FloatConverter()),
-            ("objects_categorizer", ObjectsCategorizer())
+            ("objects_categorizer", ObjectsCategorizer()),
+            ("global_float_converter", GlobalFloatConverter())
+
 
         ])

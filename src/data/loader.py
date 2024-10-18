@@ -10,7 +10,7 @@ from src.loaders.dynamic.player_stats.general import GeneralPlayerStatsLoader
 from src.loaders.dynamic.player_stats.postflop import PostflopPlayerStatsLoader
 from src.loaders.dynamic.player_stats.preflop import PreflopPlayerStatsLoader
 from src.loaders.dynamic.ref_tournaments import RefTournamentsLoader
-from src.loaders.dynamic.tournaments import TournamentLoader
+from src.loaders.dynamic.tournaments import TournamentsLoader
 from src.loaders.fixed.cards import CardsLoader
 from src.loaders.fixed.combos import CombosLoader
 from src.loaders.fixed.flops import FlopsLoader
@@ -46,7 +46,7 @@ class DataLoader:
 
     @staticmethod
     def load_tournaments():
-        return TournamentLoader().fit_transform(None)
+        return TournamentsLoader().fit_transform(None)
 
     @staticmethod
     def load_hand_histories():
@@ -76,6 +76,22 @@ class DataLoader:
     def load_player_hand_stats():
         return PlayerHandStatsLoader().fit_transform(None)
 
+    def load_showdown_hands(self):
+        phs =  self.load_player_hand_stats()
+        return phs[phs["flag_went_to_showdown"] == True]
+
+    def load_villain_hands(self):
+        phs =  self.load_player_hand_stats()
+        return phs[phs["flag_is_hero"] == False]
+
+    def  load_villain_showdown_hands(self):
+        phs =  self.load_villain_hands()
+        return phs[phs["flag_went_to_showdown"] == True]
+
+    def load_revaled_hands(self):
+        phs =  self.load_player_hand_stats()
+        return phs.dropna(subset=["player_combo"])
+
     @staticmethod
     def load_general_player_stats():
         return GeneralPlayerStatsLoader().fit_transform(None)
@@ -90,4 +106,7 @@ class DataLoader:
 
     @staticmethod
     def load_player_stats():
-        return PlayerStatsLoader().fit_transform(None)
+        return PlayerStatsLoader().fit_transform(None).set_index('name').drop(columns=['player'])
+
+    def load_villain_player_stats(self):
+        return self.load_player_stats().drop(index='manggy94')

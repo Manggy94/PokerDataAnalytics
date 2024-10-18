@@ -9,6 +9,8 @@ from src.transformers.player_hand_stats.player_hand_stats_action_street_merger i
 from src.transformers.boolean_converter import BooleanConverter
 from src.transformers.float_converter import FloatConverter
 from src.transformers.int_converter import IntConverter
+from src.transformers.na_bool_filler import NaBoolFiller
+from src.transformers.na_replacer import NaReplacer
 from src.transformers.objects_categorizer import ObjectsCategorizer
 
 class GeneralPlayerHandStatsPipeline(Pipeline):
@@ -33,6 +35,8 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
             ("hand_stats_street_merger", HandStatsActionStreetMerger(streets)),
             ("hand_stats_move_merger", HandStatsMoveMerger(action_moves)),
             ("boolean_converter", BooleanConverter()),
+            ("na_replacer", NaReplacer(source_column="player_combo", keywords=["player_combo_"])),
+            ("na_bool_filler", NaBoolFiller()),
             ("int_converter", IntConverter()),
             ("float_converter", FloatConverter()),
             ("objects_categorizer", ObjectsCategorizer())

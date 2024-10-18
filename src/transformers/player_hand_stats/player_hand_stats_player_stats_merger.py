@@ -13,4 +13,5 @@ class PlayerHandStatsPlayerStatsMerger(BaseEstimator, TransformerMixin):
 
         def transform(self, X: pd.DataFrame):
 
-            return X.merge(self.player_stats, how="left", left_on="player", right_on="player", suffixes=("", "_stats"))
+            return X.merge(self.player_stats, how="left", left_on="player", right_on="player", suffixes=("", "_stats"))\
+                .drop(columns=["player"])\
