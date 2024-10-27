@@ -1,3 +1,6 @@
+import os
+import pandas as pd
+from config.settings import ANALYTICS_DATA_DIR, POKER_DATA_DIR
 from src.loaders.dynamic.hand_histories import HandHistoriesLoader
 from src.loaders.dynamic.player_hand_stats import PlayerHandStatsLoader
 from src.loaders.dynamic.player_hand_stats.flop import FlopPlayerHandStatsLoader
@@ -20,6 +23,10 @@ from src.loaders.fixed.positions import PositionsLoader
 
 class DataLoader:
 
+    @property
+    def processed_data_dir(self):
+        return os.path.join(ANALYTICS_DATA_DIR, "processed")
+
     @staticmethod
     def load_cards():
         return CardsLoader().fit_transform(None)
@@ -29,11 +36,11 @@ class DataLoader:
         return CombosLoader().fit_transform(None)
 
     @staticmethod
-    def load_flops(self):
+    def load_flops():
         return FlopsLoader().fit_transform(None)
 
     @staticmethod
-    def load_hands(self):
+    def load_hands():
        return HandsLoader().fit_transform(None)
 
     @staticmethod
@@ -76,17 +83,54 @@ class DataLoader:
     def load_player_hand_stats():
         return PlayerHandStatsLoader().fit_transform(None)
 
+    def load_and_save_player_hand_stats(self):
+        destination_path = os.path.join(self.processed_data_dir, "player_hand_stats.parquet")
+        phs = self.load_player_hand_stats()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        return phs
+
+    def fast_load_player_hand_stats(self):
+        source_path = os.path.join(self.processed_data_dir, "player_hand_stats.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')
+
     def load_showdown_hands(self):
         phs =  self.load_player_hand_stats()
         return phs[phs["flag_went_to_showdown"] == True]
+
+    def load_and_save_showdown_hands(self):
+        destination_path = os.path.join(self.processed_data_dir, "showdown_hands.parquet")
+        phs = self.load_showdown_hands()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+
+    def fast_load_showdown_hands(self):
+        source_path = os.path.join(self.processed_data_dir, "showdown_hands.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')
 
     def load_villain_hands(self):
         phs =  self.load_player_hand_stats()
         return phs[phs["flag_is_hero"] == False]
 
+    def load_and_save_villain_hands(self):
+        destination_path = os.path.join(self.processed_data_dir, "villain_hands.parquet")
+        phs = self.load_villain_hands()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+
+    def fast_load_villain_hands(self):
+        source_path = os.path.join(self.processed_data_dir, "villain_hands.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')
+
     def  load_villain_showdown_hands(self):
         phs =  self.load_villain_hands()
         return phs[phs["flag_went_to_showdown"] == True]
+    
+    def load_and_save_villain_showdown_hands(self):
+        destination_path = os.path.join(self.processed_data_dir, "villain_showdown_hands.parquet")
+        phs = self.load_villain_showdown_hands()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+
+    def fast_load_villain_showdown_hands(self):
+        source_path = os.path.join(self.processed_data_dir, "villain_showdown_hands.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')
 
     def load_revaled_hands(self):
         phs =  self.load_player_hand_stats()
