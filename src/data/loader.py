@@ -101,6 +101,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "showdown_hands.parquet")
         phs = self.load_showdown_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        return phs
 
     def fast_load_showdown_hands(self):
         source_path = os.path.join(self.processed_data_dir, "showdown_hands.parquet")
@@ -114,6 +115,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "villain_hands.parquet")
         phs = self.load_villain_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        return phs
 
     def fast_load_villain_hands(self):
         source_path = os.path.join(self.processed_data_dir, "villain_hands.parquet")
@@ -127,14 +129,25 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "villain_showdown_hands.parquet")
         phs = self.load_villain_showdown_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        return phs
 
     def fast_load_villain_showdown_hands(self):
         source_path = os.path.join(self.processed_data_dir, "villain_showdown_hands.parquet")
         return pd.read_parquet(source_path, engine='pyarrow')
 
-    def load_revaled_hands(self):
+    def load_revealed_hands(self):
         phs =  self.load_player_hand_stats()
         return phs.dropna(subset=["player_combo"])
+
+    def load_and_save_revealed_hands(self):
+        destination_path = os.path.join(self.processed_data_dir, "revealed_hands.parquet")
+        phs = self.load_revealed_hands()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        return phs
+
+    def fast_load_revealed_hands(self):
+        source_path = os.path.join(self.processed_data_dir, "revealed_hands.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')
 
     @staticmethod
     def load_general_player_stats():
@@ -154,3 +167,12 @@ class DataLoader:
 
     def load_villain_player_stats(self):
         return self.load_player_stats().drop(index='manggy94')
+
+    def load_and_save_villain_player_stats(self):
+        destination_path = os.path.join(self.processed_data_dir, "villain_player_stats.parquet")
+        phs = self.load_villain_player_stats()
+        phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+
+    def fast_load_villain_player_stats(self):
+        source_path = os.path.join(self.processed_data_dir, "villain_player_stats.parquet")
+        return pd.read_parquet(source_path, engine='pyarrow')

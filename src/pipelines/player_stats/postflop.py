@@ -23,5 +23,5 @@ class PostflopPlayerStatsPipeline(Pipeline):
             ("int_converter", IntConverter()),
             ("flop_ratios_calculator", PostflopRatiosCalculator("flop")),
             ("turn_ratios_calculator", PostflopRatiosCalculator("turn")),
-            ("river_ratios_calculator", PostflopRatiosCalculator("river"))
+            ("river_ratios_calculator", PostflopRatiosCalculator("river")),
         ])
