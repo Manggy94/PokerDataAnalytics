@@ -9,5 +9,5 @@ class FeaturesIsolator(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         y_columns = [col for col in X.columns if "player_combo" in col]
-        X = X.drop(columns=[y_columns])
+        X = X.drop(columns=y_columns)
         return X
