@@ -12,5 +12,5 @@ class CardsLoader(Pipeline):
             ("cards_pipeline", CardsPipeline(
                 ranks=RanksLoader().transform(None),
                 suits=SuitsLoader().transform(None)
-            ))
+            )),
         ])
