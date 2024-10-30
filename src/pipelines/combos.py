@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from src.transformers.combos.category_transformer import CategoryTransformer
+from src.transformers.category_transformer import CategoryTransformer
 from src.transformers.combos.combos_cards_merger import CombosCardsMerger
 from src.transformers.combos.combos_hands_merger import CombosHandsMerger
 
