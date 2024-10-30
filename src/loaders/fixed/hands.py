@@ -1,7 +1,8 @@
 from sklearn.pipeline import Pipeline
+
+from src.loaders.fixed.ranks import RanksLoader
+from src.loaders.fixed.shapes import ShapesLoader
 from src.loaders.raw.hands import RawHandsLoader
-from src.loaders.raw.ranks import RawRanksLoader
-from src.loaders.raw.shapes import RawShapesLoader
 from src.pipelines.hands import HandsPipeline
 
 
@@ -10,7 +11,7 @@ class HandsLoader(Pipeline):
         super().__init__(steps=[
             ("raw_hands_loader", RawHandsLoader()),
             ("hands_pipeline", HandsPipeline(
-                ranks=RawRanksLoader().transform(None),
-                shapes=RawShapesLoader().transform(None)
+                ranks=RanksLoader().transform(None),
+                shapes=ShapesLoader().transform(None)
             ))
         ])
