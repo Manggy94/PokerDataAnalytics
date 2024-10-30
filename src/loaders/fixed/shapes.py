@@ -1,6 +1,6 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.shapes import RawShapesLoader
-from src.transformers.shapes.category_transformer import CategoryTransformer
+from src.transformers.category_transformer import CategoryTransformer
 
 
 class ShapesLoader(Pipeline):
