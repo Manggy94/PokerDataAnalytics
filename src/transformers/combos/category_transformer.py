@@ -8,7 +8,7 @@ class CategoryTransformer(BaseEstimator, TransformerMixin):
             return self
 
         def transform(self, X: pd.DataFrame):
-            X["id"] = X["id"].astype("uint8")
+            X["id"] = X["id"].astype("uint16")
             X["short_name"] = X["short_name"].astype("category")
-            X["rank_difference"] = X["rank_difference"].astype("uint8")
+            X["symbol"] = X["symbol"].astype("category")
             return X

@@ -15,7 +15,8 @@ class HandsPipeline(Pipeline):
         self.ranks = ranks
         self.shapes = shapes
         super().__init__(steps=[
+            ('category_transformer', CategoryTransformer()),
             ("hands_ranks_merger", HandsRanksMerger(ranks)),
             ("hands_shapes_merger", HandsShapesMerger(shapes)),
-            ('category_transformer', CategoryTransformer())
+
         ])
