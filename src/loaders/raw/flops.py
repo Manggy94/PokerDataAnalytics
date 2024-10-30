@@ -12,4 +12,5 @@ class RawFlopsLoader(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X=None):
-        return pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flops.csv', index_col=0)
+        return pd.read_csv(f'{self.ANALYTICS_DATA_DIR}/flops.csv', index_col=0).sort_values("id")\
+            .iloc[:22100]
