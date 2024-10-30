@@ -1,5 +1,7 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
+
+from src.transformers.category_transformer import CategoryTransformer
 from src.transformers.ref_tournaments.column_names_corrector import ColumnNamesCorrector
 from src.transformers.ref_tournaments.ref_tournaments_buy_ins_merger import RefTournamentsBuyInsMerger
 from src.transformers.ref_tournaments.ref_tournaments_tour_speeds_merger import RefTournamentsTourSpeedsMerger
@@ -17,6 +19,7 @@ class RefTournamentsPipeline(Pipeline):
         self.tour_speeds = tour_speeds
         self.tour_types = tour_types
         super().__init__(steps=[
+            ("category_transformer", CategoryTransformer()),
             ("ref_tournaments_buy_ins_merger", RefTournamentsBuyInsMerger(buy_ins=buy_ins)),
             ("ref_tournaments_tour_speeds_merger", RefTournamentsTourSpeedsMerger(tour_speeds=tour_speeds)),
             ("ref_tournaments_tour_types_merger", RefTournamentsTourTypesMerger(tour_types=tour_types)),
