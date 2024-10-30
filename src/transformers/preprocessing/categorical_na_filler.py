@@ -9,6 +9,7 @@ class CategoricalNaFiller(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         categorical_columns = X.select_dtypes(include=['category']).columns
+        X = X.copy()
         for col in categorical_columns:
             if X[col].isna().sum() > 0:
                 X[col] = X[col].cat.add_categories("None")

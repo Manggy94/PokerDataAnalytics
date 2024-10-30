@@ -10,13 +10,13 @@ from src.transformers.preprocessing.objects_dropper import ObjectsDropper
 from src.transformers.preprocessing.player_name_dropper import PlayerNameDropper
 
 
-class ClassificationFeaturesPreprocessor(Pipeline):
+class NeuralNetworkFeaturesPreprocessor(Pipeline):
     def __init__(self):
         super().__init__(
             steps=[
                 ('features_isolator', FeaturesIsolator()),
                 ('id_dropper', IdDropper()),
-                # ('player_name_dropper', PlayerNameDropper()),
+                ('player_name_dropper', PlayerNameDropper()),
                 ('objects_dropper', ObjectsDropper()),
                 ('datetime_dropper', DateTimeDropper()),
                 ('categorical_na_filler', CategoricalNaFiller()),
