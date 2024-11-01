@@ -1,14 +1,16 @@
 import os
+import numpy as np
 import pandas as pd
-from config.settings import ANALYTICS_DATA_DIR
 
 
-def map_id_dtype(df: pd.DataFrame):
-    size = df["id"].unique().size
-    if size < 256:
-        return "uint8"
-    if size < 65536:
-        return "uint16"
-    if size < 4294967296:
-        return "uint32"
-    return "uint64"
+def map_int_dtype(s: pd.Series):
+    size = s.unique().size
+    if size < 256//2:
+        dtype = np.int8
+    elif size < 65536//2:
+        dtype = np.int16
+    elif size < 4294967296//2:
+        dtype = np.int32
+    else:
+        dtype = np.int64
+    return s.fillna(-1).astype(dtype).replace(-1, np.nan)

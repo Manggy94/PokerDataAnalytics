@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from src.utils.helpers import map_int_dtype
 
 
 class CategoryTransformer(BaseEstimator, TransformerMixin):
@@ -8,9 +9,9 @@ class CategoryTransformer(BaseEstimator, TransformerMixin):
             return self
 
         def transform(self, X: pd.DataFrame):
-            X["id"] = X["id"].astype("uint16")
+            X["id"] = map_int_dtype(X["id"])
             X["short_name"] = X["short_name"].astype("category")
             X["symbol"] = X["symbol"].astype("category")
-            X["min_distance"] = X["min_distance"].astype("uint8")
-            X["max_distance"] = X["max_distance"].astype("uint8")
+            X["min_distance"] = map_int_dtype(X["min_distance"])
+            X["max_distance"] = map_int_dtype(X["max_distance"])
             return X

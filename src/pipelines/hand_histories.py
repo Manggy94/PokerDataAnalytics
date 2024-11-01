@@ -51,5 +51,5 @@ class HandHistoriesPipeline(Pipeline):
             ("na_replacer_river", NaReplacer(source_column="river_card", keywords=["river_card_"])),
             ("na_bool_filler", NaBoolFiller()),
             ("float_converter", FloatConverter()),
-            ("objects_categorizer", ObjectsCategorizer())
+            # ("objects_categorizer", ObjectsCategorizer())
         ])

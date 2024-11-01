@@ -20,5 +20,5 @@ class StreetPlayerHandStatsPipeline(Pipeline):
             ("na_bool_filler", NaBoolFiller()),
             ("int_converter", IntConverter()),
             ("float_converter", FloatConverter()),
-            ("objects_categorizer", ObjectsCategorizer())
+            # ("objects_categorizer", ObjectsCategorizer())
         ])

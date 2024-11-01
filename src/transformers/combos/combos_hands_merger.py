@@ -12,8 +12,9 @@ class CombosHandsMerger(BaseEstimator, TransformerMixin):
             return self
 
         def transform(self, X: pd.DataFrame):
-            return X\
+            X =  X\
                 .merge(self.hands, how="left", left_on="hand", right_on="id", suffixes=("", "_hand"))\
                 .drop(columns=["id_hand", "hand"])\
                 .rename(columns={"hand_short_name": "hand"})
+            return X
 

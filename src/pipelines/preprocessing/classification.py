@@ -7,7 +7,6 @@ from src.transformers.preprocessing.features_isolator import FeaturesIsolator
 from src.transformers.preprocessing.id_dropper import IdDropper
 from src.transformers.preprocessing.numerical_na_filler import NumericalNaFiller
 from src.transformers.preprocessing.objects_dropper import ObjectsDropper
-from src.transformers.preprocessing.player_name_dropper import PlayerNameDropper
 
 
 class ClassificationFeaturesPreprocessor(Pipeline):
@@ -16,7 +15,6 @@ class ClassificationFeaturesPreprocessor(Pipeline):
             steps=[
                 ('features_isolator', FeaturesIsolator()),
                 ('id_dropper', IdDropper()),
-                # ('player_name_dropper', PlayerNameDropper()),
                 ('objects_dropper', ObjectsDropper()),
                 ('datetime_dropper', DateTimeDropper()),
                 ('categorical_na_filler', CategoricalNaFiller()),

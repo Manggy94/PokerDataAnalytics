@@ -3,6 +3,7 @@ from sklearn.pipeline import Pipeline
 from src.transformers.player_hand_stats.general.combos_merger import CombosMerger
 from src.transformers.player_hand_stats.general.na_dropper import NaDropper
 from src.transformers.player_hand_stats.general.positions_merger import PositionsMerger
+from src.transformers.player_hand_stats.general.raw_dtypes_corrector import RawDtypesCorrector
 from src.transformers.player_hand_stats.general.seats_categorizer import SeatsCategorizer
 from src.transformers.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
 from src.transformers.player_hand_stats.player_hand_stats_action_street_merger import HandStatsActionStreetMerger
@@ -28,6 +29,7 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
         self.positions = positions
         self.streets = streets
         super().__init__(steps=[
+            ('"raw_dtypes_corrector', RawDtypesCorrector()),
             ("na_dropper", NaDropper()),
             ("seats_categorizer", SeatsCategorizer()),
             ("combos_merger", CombosMerger(combos)),
@@ -39,5 +41,4 @@ class GeneralPlayerHandStatsPipeline(Pipeline):
             ("na_bool_filler", NaBoolFiller()),
             ("int_converter", IntConverter()),
             ("float_converter", FloatConverter()),
-            ("objects_categorizer", ObjectsCategorizer())
         ])

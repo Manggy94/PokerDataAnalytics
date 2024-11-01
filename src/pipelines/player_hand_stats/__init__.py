@@ -6,6 +6,7 @@ from src.transformers.player_hand_stats.player_hand_stats_hand_history_merger im
 from src.transformers.player_hand_stats.player_hand_stats_general_merger import HandStatsGeneralMerger
 from src.transformers.player_hand_stats.player_hand_stats_player_stats_merger import PlayerHandStatsPlayerStatsMerger
 from src.transformers.player_hand_stats.player_hand_stats_street_merger import HandStatsStreetMerger
+from src.transformers.player_hand_stats.category_transformer import CategoryTransformer
 
 class PlayerHandStatsPipeline(Pipeline):
     def __init__(
@@ -33,6 +34,7 @@ class PlayerHandStatsPipeline(Pipeline):
             ("hand_stats_turn_merger", HandStatsStreetMerger(turn_player_hand_stats, "turn")),
             ("hand_stats_river_merger", HandStatsStreetMerger(river_player_hand_stats, "river")),
             ("player_hand_stats_player_stats_merger", PlayerHandStatsPlayerStatsMerger(player_stats)),
+            ("category_transformer", CategoryTransformer()),
             ("bb_normalizer", BBNormalizer()),
             ("na_bool_filler", NaBoolFiller())
         ])

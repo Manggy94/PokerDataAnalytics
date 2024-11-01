@@ -11,5 +11,5 @@ class BoolToIntConverter(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         bool_cols = X.select_dtypes(include=[np.bool8]).columns
-        X[bool_cols] = X[bool_cols].astype("Int8")
+        X[bool_cols] = X[bool_cols].astype(np.int8)
         return X

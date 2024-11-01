@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from src.utils.helpers import map_int_dtype
+
 
 class IntConverter(BaseEstimator, TransformerMixin):
 
@@ -16,6 +18,9 @@ class IntConverter(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        X[self.int_8_columns] = X[self.int_8_columns].astype("Int8")
-        X[self.int_32_columns] = X[self.int_32_columns].astype("Int32")
+        X = X.copy()
+        for col in self.int_8_columns + self.int_32_columns:
+            X[col] = map_int_dtype(X[col])
+        # X[self.int_8_columns] = X[self.int_8_columns].astype("Int8")
+        # X[self.int_32_columns] = X[self.int_32_columns].astype("Int32")
         return X

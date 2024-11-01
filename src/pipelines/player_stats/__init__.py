@@ -35,6 +35,6 @@ class PlayerStatsPipeline(Pipeline):
                 raw_river_player_stats=raw_river_player_stats)
              ),
             ('player_id_dropper', PlayerIdDropper()),
-            ('objects_categorizer', ObjectsCategorizer()),
+            # ('objects_categorizer', ObjectsCategorizer()),
             ('count_dropper', CountDropper())
         ])
