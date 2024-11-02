@@ -5,7 +5,7 @@ from src.loaders.fixed.combos import CombosLoader
 from src.loaders.fixed.positions import PositionsLoader
 from src.loaders.fixed.streets import StreetsLoader
 from src.loaders.raw.player_hand_stats.general import RawGeneralPlayerHandStatsLoader
-from src.pipelines.player_hand_stats.general import GeneralPlayerHandStatsPipeline
+from src.pipelines.components.player_hand_stats.general import GeneralPlayerHandStatsPipeline
 
 
 class GeneralPlayerHandStatsLoader(Pipeline):

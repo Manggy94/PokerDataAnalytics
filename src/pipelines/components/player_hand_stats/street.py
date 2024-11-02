@@ -1,12 +1,11 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.transformers.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
-from src.transformers.player_hand_stats.player_hand_stats_sequence_merger import HandStatsSequenceMerger
-from src.transformers.boolean_converter import BooleanConverter
-from src.transformers.float_converter import FloatConverter
-from src.transformers.int_converter import IntConverter
-from src.transformers.na_bool_filler import NaBoolFiller
-from src.transformers.objects_categorizer import ObjectsCategorizer
+from src.transformers.components.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
+from src.transformers.components.player_hand_stats.player_hand_stats_sequence_merger import HandStatsSequenceMerger
+from src.transformers.utils.boolean_converter import BooleanConverter
+from src.transformers.utils.float_converter import FloatConverter
+from src.transformers.utils.int_converter import IntConverter
+from src.transformers.utils.na_bool_filler import NaBoolFiller
 
 
 class StreetPlayerHandStatsPipeline(Pipeline):

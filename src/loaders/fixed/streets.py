@@ -1,6 +1,6 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.streets import RawStreetsLoader
-from src.transformers.streets.category_transformer import CategoryTransformer
+from src.transformers.components.streets.category_transformer import CategoryTransformer
 
 
 class StreetsLoader(Pipeline):

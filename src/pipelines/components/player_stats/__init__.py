@@ -1,11 +1,10 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
-from src.pipelines.player_stats.postflop import PostflopPlayerStatsPipeline
-from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
-from src.transformers.player_stats.cnt_dropper import CountDropper
-from src.transformers.player_stats.player_id_dropper import PlayerIdDropper
-from src.transformers.objects_categorizer import ObjectsCategorizer
+from src.pipelines.components.player_stats.general import GeneralPlayerStatsPipeline
+from src.pipelines.components.player_stats.postflop import PostflopPlayerStatsPipeline
+from src.pipelines.components.player_stats.preflop import PreflopPlayerStatsPipeline
+from src.transformers.components.player_stats.cnt_dropper import CountDropper
+from src.transformers.components.player_stats.player_id_dropper import PlayerIdDropper
 
 
 class PlayerStatsPipeline(Pipeline):

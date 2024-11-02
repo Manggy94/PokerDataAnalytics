@@ -1,6 +1,6 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.suits import RawSuitsLoader
-from src.transformers.category_transformer import CategoryTransformer
+from src.transformers.utils.category_transformer import CategoryTransformer
 
 
 class SuitsLoader(Pipeline):

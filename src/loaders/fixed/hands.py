@@ -3,7 +3,7 @@ from sklearn.pipeline import Pipeline
 from src.loaders.fixed.ranks import RanksLoader
 from src.loaders.fixed.shapes import ShapesLoader
 from src.loaders.raw.hands import RawHandsLoader
-from src.pipelines.hands import HandsPipeline
+from src.pipelines.components.hands import HandsPipeline
 
 
 class HandsLoader(Pipeline):

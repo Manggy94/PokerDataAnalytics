@@ -1,6 +1,6 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.positions import RawPositionsLoader
-from src.pipelines.positions import PositionsPipeline
+from src.pipelines.components.positions import PositionsPipeline
 
 
 class PositionsLoader(Pipeline):

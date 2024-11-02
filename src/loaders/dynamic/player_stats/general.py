@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.player_stats import RawPlayerStatsLoader
 from src.loaders.raw.player_stats.general import RawGeneralPlayerStatsLoader
-from src.pipelines.player_stats.general import GeneralPlayerStatsPipeline
+from src.pipelines.components.player_stats.general import GeneralPlayerStatsPipeline
 
 
 

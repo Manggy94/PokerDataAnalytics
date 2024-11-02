@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.player_stats import RawPlayerStatsLoader
 from src.loaders.raw.player_stats.preflop import RawPreflopPlayerStatsLoader
-from src.pipelines.player_stats.preflop import PreflopPlayerStatsPipeline
+from src.pipelines.components.player_stats.preflop import PreflopPlayerStatsPipeline
 
 
 class PreflopPlayerStatsLoader(Pipeline):

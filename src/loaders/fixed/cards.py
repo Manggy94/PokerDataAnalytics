@@ -2,7 +2,7 @@ from sklearn.pipeline import Pipeline
 from src.loaders.raw.cards import RawCardsLoader
 from src.loaders.fixed.ranks import RanksLoader
 from src.loaders.fixed.suits import SuitsLoader
-from src.pipelines.cards import CardsPipeline
+from src.pipelines.components.cards import CardsPipeline
 
 
 class CardsLoader(Pipeline):

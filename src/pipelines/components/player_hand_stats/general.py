@@ -1,18 +1,18 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.transformers.player_hand_stats.general.combos_merger import CombosMerger
-from src.transformers.player_hand_stats.general.na_dropper import NaDropper
-from src.transformers.player_hand_stats.general.positions_merger import PositionsMerger
-from src.transformers.player_hand_stats.general.raw_dtypes_corrector import RawDtypesCorrector
-from src.transformers.player_hand_stats.general.seats_categorizer import SeatsCategorizer
-from src.transformers.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
-from src.transformers.player_hand_stats.player_hand_stats_action_street_merger import HandStatsActionStreetMerger
-from src.transformers.boolean_converter import BooleanConverter
-from src.transformers.float_converter import FloatConverter
-from src.transformers.int_converter import IntConverter
-from src.transformers.na_bool_filler import NaBoolFiller
-from src.transformers.na_replacer import NaReplacer
-from src.transformers.objects_categorizer import ObjectsCategorizer
+from src.transformers.components.player_hand_stats.general.combos_merger import CombosMerger
+from src.transformers.components.player_hand_stats.general.na_dropper import NaDropper
+from src.transformers.components.player_hand_stats.general.positions_merger import PositionsMerger
+from src.transformers.components.player_hand_stats.general.raw_dtypes_corrector import RawDtypesCorrector
+from src.transformers.components.player_hand_stats.general.seats_categorizer import SeatsCategorizer
+from src.transformers.components.player_hand_stats.player_hand_stats_move_merger import HandStatsMoveMerger
+from src.transformers.components.player_hand_stats.player_hand_stats_action_street_merger import HandStatsActionStreetMerger
+from src.transformers.utils.boolean_converter import BooleanConverter
+from src.transformers.utils.float_converter import FloatConverter
+from src.transformers.utils.int_converter import IntConverter
+from src.transformers.utils.na_bool_filler import NaBoolFiller
+from src.transformers.utils.na_replacer import NaReplacer
+
 
 class GeneralPlayerHandStatsPipeline(Pipeline):
 

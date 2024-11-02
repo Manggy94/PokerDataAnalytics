@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.fixed.cards import CardsLoader
 from src.loaders.raw.flops import RawFlopsLoader
-from src.pipelines.flops import FlopsPipeline
+from src.pipelines.components.flops import FlopsPipeline
 
 
 class FlopsLoader(Pipeline):

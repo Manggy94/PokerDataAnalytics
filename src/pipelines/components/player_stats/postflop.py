@@ -1,9 +1,9 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from src.transformers.player_stats.int_converter import IntConverter
-from src.transformers.player_stats.player_stats_street_merger import PlayerStatsStreetMerger
-from src.transformers.player_stats.postflop_ratios_calculator import PostflopRatiosCalculator
+from src.transformers.components.player_stats.int_converter import IntConverter
+from src.transformers.components.player_stats.player_stats_street_merger import PlayerStatsStreetMerger
+from src.transformers.components.player_stats.postflop_ratios_calculator import PostflopRatiosCalculator
 
 
 class PostflopPlayerStatsPipeline(Pipeline):

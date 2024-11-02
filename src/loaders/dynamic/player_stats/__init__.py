@@ -6,8 +6,8 @@ from src.loaders.raw.player_stats.preflop import RawPreflopPlayerStatsLoader
 from src.loaders.raw.player_stats.flop import RawFlopPlayerStatsLoader
 from src.loaders.raw.player_stats.turn import RawTurnPlayerStatsLoader
 from src.loaders.raw.player_stats.river import RawRiverPlayerStatsLoader
-from src.pipelines.player_stats import PlayerStatsPipeline
-from src.transformers.player_names_merger import PlayerNamesMerger
+from src.pipelines.components.player_stats import PlayerStatsPipeline
+from src.transformers.components.player_stats.player_names_merger import PlayerNamesMerger
 
 
 class PlayerStatsLoader(Pipeline):

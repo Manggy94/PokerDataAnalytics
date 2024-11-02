@@ -3,7 +3,7 @@ from src.loaders.raw.player_stats import RawPlayerStatsLoader
 from src.loaders.raw.player_stats.flop import RawFlopPlayerStatsLoader
 from src.loaders.raw.player_stats.turn import RawTurnPlayerStatsLoader
 from src.loaders.raw.player_stats.river import RawRiverPlayerStatsLoader
-from src.pipelines.player_stats.postflop import PostflopPlayerStatsPipeline
+from src.pipelines.components.player_stats.postflop import PostflopPlayerStatsPipeline
 
 
 class PostflopPlayerStatsLoader(Pipeline):

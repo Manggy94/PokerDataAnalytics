@@ -1,11 +1,11 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from src.transformers.category_transformer import CategoryTransformer
-from src.transformers.ref_tournaments.column_names_corrector import ColumnNamesCorrector
-from src.transformers.ref_tournaments.ref_tournaments_buy_ins_merger import RefTournamentsBuyInsMerger
-from src.transformers.ref_tournaments.ref_tournaments_tour_speeds_merger import RefTournamentsTourSpeedsMerger
-from src.transformers.ref_tournaments.ref_tournaments_tour_types_merger import RefTournamentsTourTypesMerger
+from src.transformers.utils.category_transformer import CategoryTransformer
+from src.transformers.components.ref_tournaments.column_names_corrector import ColumnNamesCorrector
+from src.transformers.components.ref_tournaments.ref_tournaments_buy_ins_merger import RefTournamentsBuyInsMerger
+from src.transformers.components.ref_tournaments.ref_tournaments_tour_speeds_merger import RefTournamentsTourSpeedsMerger
+from src.transformers.components.ref_tournaments.ref_tournaments_tour_types_merger import RefTournamentsTourTypesMerger
 
 
 class RefTournamentsPipeline(Pipeline):

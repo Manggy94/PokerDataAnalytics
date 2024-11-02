@@ -3,7 +3,7 @@ from sklearn.pipeline import Pipeline
 from src.loaders.dynamic.actions_sequences import ActionsSequencesLoader
 from src.loaders.fixed.action_moves import ActionMovesLoader
 from src.loaders.raw.player_hand_stats.preflop import RawPreflopPlayerHandStatsLoader
-from src.pipelines.player_hand_stats.street import StreetPlayerHandStatsPipeline
+from src.pipelines.components.player_hand_stats.street import StreetPlayerHandStatsPipeline
 
 
 class PreflopPlayerHandStatsLoader(Pipeline):

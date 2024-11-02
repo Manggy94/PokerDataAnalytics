@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from src.transformers.flops.category_transformer import CategoryTransformer
-from src.transformers.flops.flops_cards_merger import FlopsCardsMerger
+from src.transformers.components.flops.category_transformer import CategoryTransformer
+from src.transformers.components.flops.flops_cards_merger import FlopsCardsMerger
 
 
 class FlopsPipeline(Pipeline):

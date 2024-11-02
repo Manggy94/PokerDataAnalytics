@@ -7,7 +7,7 @@ from src.loaders.dynamic.player_hand_stats.river import RiverPlayerHandStatsLoad
 from src.loaders.dynamic.player_hand_stats.turn import TurnPlayerHandStatsLoader
 from src.loaders.dynamic.player_stats import PlayerStatsLoader
 from src.loaders.raw.player_hand_stats import RawPlayerHandStatsLoader
-from src.pipelines.player_hand_stats import PlayerHandStatsPipeline
+from src.pipelines.components.player_hand_stats import PlayerHandStatsPipeline
 
 
 class PlayerHandStatsLoader(Pipeline):

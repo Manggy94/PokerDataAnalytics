@@ -5,7 +5,7 @@ from src.loaders.fixed.combos import CombosLoader
 from src.loaders.fixed.flops import FlopsLoader
 from src.loaders.raw.hand_histories import RawHandHistoriesLoader
 from src.loaders.raw.levels import RawLevelsLoader
-from src.pipelines.hand_histories import HandHistoriesPipeline
+from src.pipelines.components.hand_histories import HandHistoriesPipeline
 
 
 class HandHistoriesLoader(Pipeline):

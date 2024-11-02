@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from src.loaders.raw.tournaments import RawTournamentsLoader
 from src.loaders.dynamic.ref_tournaments import RefTournamentsLoader
-from src.pipelines.tournaments import TournamentsPipeline
+from src.pipelines.components.tournaments import TournamentsPipeline
 
 
 class TournamentsLoader(Pipeline):

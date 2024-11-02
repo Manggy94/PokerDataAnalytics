@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.transformers.cards.cards_ranks_merger import CardsRanksMerger
-from src.transformers.cards.cards_suits_merger import CardsSuitsMerger
-from src.transformers.category_transformer import CategoryTransformer
+from src.transformers.components.cards.cards_ranks_merger import CardsRanksMerger
+from src.transformers.components.cards.cards_suits_merger import CardsSuitsMerger
+from src.transformers.utils.category_transformer import CategoryTransformer
 
 
 class CardsPipeline(Pipeline):

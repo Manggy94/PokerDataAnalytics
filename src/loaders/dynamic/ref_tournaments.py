@@ -4,7 +4,7 @@ from src.loaders.fixed.tour_speeds import TourSpeedsLoader
 from src.loaders.fixed.tour_types import TourTypesLoader
 from src.loaders.raw.buy_ins import RawBuyInsLoader
 from src.loaders.raw.ref_tournaments import RawRefTournamentsLoader
-from src.pipelines.ref_tournaments import RefTournamentsPipeline
+from src.pipelines.components.ref_tournaments import RefTournamentsPipeline
 
 
 

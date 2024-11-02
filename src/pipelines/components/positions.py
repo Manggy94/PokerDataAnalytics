@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 
-from src.transformers.category_transformer import CategoryTransformer
-from src.transformers.positions.columns_cleaner import PositionsColumnsCleaner
+from src.transformers.utils.category_transformer import CategoryTransformer
+from src.transformers.components.positions.columns_cleaner import PositionsColumnsCleaner
 
 
 class PositionsPipeline(Pipeline):

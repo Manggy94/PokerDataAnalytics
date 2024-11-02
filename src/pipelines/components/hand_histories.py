@@ -1,19 +1,18 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from src.transformers.hand_histories.hand_date_type_corrector import HandDateTypeCorrector
-from src.transformers.hand_histories.hand_histories_combos_merger import HandHistoriesCombosMerger
-from src.transformers.hand_histories.hand_histories_flops_merger import HandHistoriesFlopsMerger
-from src.transformers.hand_histories.hand_histories_levels_merger import HandHistoriesLevelsMerger
-from src.transformers.hand_histories.hand_histories_river_merger import HandHistoriesRiverMerger
-from src.transformers.hand_histories.hand_histories_turn_merger import HandHistoriesTurnMerger
-from src.transformers.hand_histories.hand_id_dropper import HandIdDropper
-from src.transformers.hand_histories.hand_histories_tournaments_merger import HandHistoriesTournamentsMerger
-from src.transformers.boolean_converter import BooleanConverter
-from src.transformers.float_converter import FloatConverter
-from src.transformers.int_converter import IntConverter
-from src.transformers.na_bool_filler import NaBoolFiller
-from src.transformers.na_replacer import NaReplacer
-from src.transformers.objects_categorizer import ObjectsCategorizer
+from src.transformers.components.hand_histories.hand_date_type_corrector import HandDateTypeCorrector
+from src.transformers.components.hand_histories.hand_histories_combos_merger import HandHistoriesCombosMerger
+from src.transformers.components.hand_histories.hand_histories_flops_merger import HandHistoriesFlopsMerger
+from src.transformers.components.hand_histories.hand_histories_levels_merger import HandHistoriesLevelsMerger
+from src.transformers.components.hand_histories.hand_histories_river_merger import HandHistoriesRiverMerger
+from src.transformers.components.hand_histories.hand_histories_turn_merger import HandHistoriesTurnMerger
+from src.transformers.components.hand_histories.hand_id_dropper import HandIdDropper
+from src.transformers.components.hand_histories.hand_histories_tournaments_merger import HandHistoriesTournamentsMerger
+from src.transformers.utils.boolean_converter import BooleanConverter
+from src.transformers.utils.float_converter import FloatConverter
+from src.transformers.utils.int_converter import IntConverter
+from src.transformers.utils.na_bool_filler import NaBoolFiller
+from src.transformers.utils.na_replacer import NaReplacer
 
 
 class HandHistoriesPipeline(Pipeline):
