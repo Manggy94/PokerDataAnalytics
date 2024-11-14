@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from src.pipelines.preprocessing.features.categorical import CategoricalFeaturesPipeline
 from src.pipelines.preprocessing.features.numerical import NumericalFeaturesPipeline
+from src.transformers.utils.float_64_reducer import Float64Reducer
 
 
 class GlobalFeaturesPreprocessor(BaseEstimator, TransformerMixin):
@@ -20,4 +21,7 @@ class GlobalFeaturesPreprocessor(BaseEstimator, TransformerMixin):
     def transform(self, X):
         X_cat = self.categorical_features_pipeline.transform(X)
         X_num = self.numerical_features_pipeline.transform(X)
-        return pd.concat([X_num, X_cat], axis=1).fillna(-1)
+        X = pd.concat([X_num, X_cat], axis=1).fillna(-1)
+        reducer = Float64Reducer()
+        X = reducer.fit_transform(X)
+        return X

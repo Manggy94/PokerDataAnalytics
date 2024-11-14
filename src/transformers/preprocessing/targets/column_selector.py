@@ -10,4 +10,5 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame):
-        return X[[self.column]]
+        target = X[self.column]
+        return target
