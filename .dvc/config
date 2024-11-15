@@ -1,2 +1,5 @@
 [core]
     autostage = true
+    remote = pokerbrain_data
+['remote "pokerbrain_data"']
+    url = s3://pokerbrain/dvcstore

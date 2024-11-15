@@ -1,3 +1,4 @@
+import boto3
 import os
 import pandas as pd
 from config.settings import ANALYTICS_DATA_DIR, POKER_DATA_DIR
@@ -22,6 +23,12 @@ from src.loaders.fixed.positions import PositionsLoader
 
 
 class DataLoader:
+
+    def __init__(self):
+        self.s3 = boto3.client('s3')
+        self.bucket_name = "pokerbrain"
+        self.s3_dataframes_dir = "data/dataframes"
+        self.s3_processed_data_dir = "data/dataframes/processed"
 
     @property
     def processed_data_dir(self):
@@ -87,6 +94,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "player_hand_stats.parquet")
         phs = self.load_player_hand_stats()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        self.s3.upload_file(destination_path, self.bucket_name, f"{self.s3_processed_data_dir}/player_hand_stats.parquet")
         return phs
 
     def fast_load_player_hand_stats(self):
@@ -101,6 +109,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "showdown_hands.parquet")
         phs = self.load_showdown_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        self.s3.upload_file(destination_path, self.bucket_name, f"{self.s3_processed_data_dir}/showdown_hands.parquet")
         return phs
 
     def fast_load_showdown_hands(self):
@@ -115,6 +124,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "villain_hands.parquet")
         phs = self.load_villain_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        self.s3.upload_file(destination_path, self.bucket_name, f"{self.s3_processed_data_dir}/villain_hands.parquet")
         return phs
 
     def fast_load_villain_hands(self):
@@ -129,6 +139,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "villain_showdown_hands.parquet")
         phs = self.load_villain_showdown_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        self.s3.upload_file(destination_path, self.bucket_name, f"{self.s3_processed_data_dir}/villain_showdown_hands.parquet")
         return phs
 
     def fast_load_villain_showdown_hands(self):
@@ -143,6 +154,7 @@ class DataLoader:
         destination_path = os.path.join(self.processed_data_dir, "revealed_hands.parquet")
         phs = self.load_revealed_hands()
         phs.to_parquet(destination_path, engine='pyarrow', compression='snappy')
+        self.s3.upload_file(destination_path, self.bucket_name, f"{self.s3_processed_data_dir}/revealed_hands.parquet")
         return phs
 
     def fast_load_revealed_hands(self):
