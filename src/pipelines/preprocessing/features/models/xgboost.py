@@ -2,7 +2,7 @@ from sklearn.pipeline import Pipeline
 from src.transformers.preprocessing.features import GlobalFeaturesPreprocessor
 
 
-class RandomForestFeaturesPreprocessor(Pipeline):
+class XGBoostFeaturesPreprocessor(Pipeline):
     def __init__(self):
         super().__init__(
             steps=[
