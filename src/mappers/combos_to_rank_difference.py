@@ -3,15 +3,16 @@ from src.data.loader import DataLoader
 from pkrcomponents.components.cards.combo import Combo
 
 
-def combos_is_connector_matrix() -> pd.DataFrame:
+def combos_rank_difference_matrix() -> pd.DataFrame:
     source = DataLoader().load_combos()
     combos = source.short_name.cat.categories
+    ranks = source.hand_rank_difference.sort_values().unique()
     matrix = pd.DataFrame(
         index=combos,
-        columns=["is_connector"],
+        columns=ranks,
         data=0,
         dtype=int)
     for combo in Combo:
-        x = f"{combo}"
-        matrix.loc[x, "is_connector"] = int(combo.is_connector)
+        x, y = f"{combo}", combo.rank_difference
+        matrix.loc[x, y] = 1
     return matrix
