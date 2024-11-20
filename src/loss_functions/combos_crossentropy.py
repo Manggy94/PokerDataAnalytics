@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from src.loss_functions.combo_broadway_crossentropy import CombosBroadwayCrossEntropy
+from src.loss_functions.combos_first_card_crossentropy import CombosFirstCardCrossEntropy
 from src.loss_functions.combos_first_rank_crossentropy import CombosFirstRankCrossEntropy
 from src.loss_functions.combos_hands_crossentropy import CombosHandsCrossEntropy
 from src.loss_functions.combos_ranks_crossentropy import CombosRanksCrossEntropy
@@ -17,6 +18,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             suits_factor = 1,
             ranks_factor = 1,
             first_rank_factor = 1,
+            first_card_factor = 1,
             second_rank_factor = 1,
             broadway_factor = 1
     ):
@@ -25,6 +27,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
         self.suits_factor = suits_factor
         self.ranks_factor = ranks_factor
         self.first_rank_factor = first_rank_factor
+        self.first_card_factor = first_card_factor
         self.second_rank_factor = second_rank_factor
         self.broadway_factor = broadway_factor
 
@@ -32,6 +35,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
         self.suits_loss_function = CombosSuitsCrossEntropy()
         self.ranks_loss_function = CombosRanksCrossEntropy()
         self.first_rank_loss_function = CombosFirstRankCrossEntropy()
+        self.first_card_loss_function = CombosFirstCardCrossEntropy()
         self.second_rank_loss_function = CombosSecondRankCrossEntropy()
         self.combo_broadway_loss_function = CombosBroadwayCrossEntropy()
         super().__init__(name=name)
@@ -42,6 +46,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
         suits_loss = tf.reduce_mean(self.suits_loss_function.call(y_true, y_pred))
         ranks_loss = tf.reduce_mean(self.ranks_loss_function.call(y_true, y_pred))
         first_rank_loss = tf.reduce_mean(self.first_rank_loss_function.call(y_true, y_pred))
+        first_card_loss = tf.reduce_mean(self.first_card_loss_function.call(y_true, y_pred))
         second_rank_loss = tf.reduce_mean(self.second_rank_loss_function.call(y_true, y_pred))
         broadway_loss = tf.reduce_mean(self.combo_broadway_loss_function.call(y_true, y_pred))
         losses = tf.stack([
@@ -50,6 +55,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             suits_loss,
             ranks_loss,
             first_rank_loss,
+            first_card_loss,
             second_rank_loss,
             broadway_loss
         ])
@@ -59,6 +65,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             self.suits_factor,
             self.ranks_factor,
             self.first_rank_factor,
+            self.first_card_factor,
             self.second_rank_factor,
             self.broadway_factor
         ], dtype=tf.float32)
