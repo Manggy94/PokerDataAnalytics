@@ -20,6 +20,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             first_rank_factor = 1,
             first_card_factor = 1,
             second_rank_factor = 1,
+            second_card_factor = 1,
             broadway_factor = 1
     ):
         self.factors = tf.constant([
@@ -30,6 +31,7 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             first_rank_factor,
             first_card_factor,
             second_rank_factor,
+            second_card_factor,
             broadway_factor
         ], dtype=tf.float32)
         self.loss_functions = [
@@ -40,9 +42,9 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             CombosFirstRankCrossEntropy(),
             CombosFirstCardCrossEntropy(),
             CombosSecondRankCrossEntropy(),
+            CombosSecondRankCrossEntropy(),
             CombosBroadwayCrossEntropy()
         ]
-
         super().__init__(name=name)
 
     def call(self, y_true, y_pred):
