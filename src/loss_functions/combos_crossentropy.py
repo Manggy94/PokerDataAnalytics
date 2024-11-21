@@ -4,7 +4,9 @@ from src.loss_functions.combos_connector_crossentropy import CombosConnectorCros
 from src.loss_functions.combos_first_card_crossentropy import CombosFirstCardCrossEntropy
 from src.loss_functions.combos_first_rank_crossentropy import CombosFirstRankCrossEntropy
 from src.loss_functions.combos_hands_crossentropy import CombosHandsCrossEntropy
+from src.loss_functions.combos_paired_crossentropy import CombosPairedCrossEntropy
 from src.loss_functions.combos_ranks_crossentropy import CombosRanksCrossEntropy
+from src.loss_functions.combos_ranks_difference_crossentropy import CombosRankDifferenceCrossEntropy
 from src.loss_functions.combos_second_card_crossentropy import CombosSecondCardCrossEntropy
 from src.loss_functions.combos_second_rank_crossentropy import CombosSecondRankCrossEntropy
 from src.loss_functions.combos_suits_crossentropy import CombosSuitsCrossEntropy
@@ -24,6 +26,8 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             second_card_factor = 1,
             broadway_factor = 1,
             connectors_factor = 1,
+            paired_factor = 1,
+            rank_difference_factor = 1,
     ):
         self.factors = tf.constant([
             combos_factor,
@@ -35,7 +39,10 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             second_rank_factor,
             second_card_factor,
             broadway_factor,
-            connectors_factor
+            connectors_factor,
+            paired_factor,
+            rank_difference_factor,
+
         ], dtype=tf.float32)
         self.loss_functions = [
             tf.keras.losses.CategoricalCrossentropy(),
@@ -48,6 +55,8 @@ class CombosCrossEntropy(tf.keras.losses.Loss):
             CombosSecondCardCrossEntropy(),
             CombosBroadwayCrossEntropy(),
             CombosConnectorCrossEntropy(),
+            CombosPairedCrossEntropy(),
+            CombosRankDifferenceCrossEntropy(),
         ]
         super().__init__(name=name)
 

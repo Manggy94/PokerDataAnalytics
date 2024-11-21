@@ -11,7 +11,7 @@ class CoverageCurve(tf.keras.metrics.Metric):
         self.num_labels = self.add_weight(name="num_labels", initializer="zeros", dtype=tf.int32, trainable=False)
 
     @staticmethod
-    def top_k_coverage_curve(y_true, y_pred):
+    def coverage_curve(y_true, y_pred):
         """
         Calcule les valeurs de top-k accuracy pour tous les k de 1 à y_true.shape[1].
 
@@ -36,7 +36,7 @@ class CoverageCurve(tf.keras.metrics.Metric):
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         # Calcul de la courbe de couverture pour le batch courant
-        batch_coverage_curve = self.top_k_coverage_curve(y_true, y_pred)
+        batch_coverage_curve = self.coverage_curve(y_true, y_pred)
         self.coverage_curve.assign(tf.reduce_mean(batch_coverage_curve, axis=0))  # Moyenne sur les échantillons du batch
         self.num_labels.assign(y_true.shape[1])
 
