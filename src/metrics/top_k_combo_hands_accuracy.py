@@ -1,4 +1,4 @@
-from src.mappers.combos_to_hands import combos_hands_matrix
+from src.mappers.combos.categorical.combos_to_hands import combos_hands_matrix
 from src.metrics.top_k_combo_accuracy_base import TopKComboAccuracyBase
 
 

@@ -1,4 +1,4 @@
-from src.mappers.combos_to_first_card import combos_first_card_matrix
+from src.mappers.combos.categorical.combos_to_first_card import combos_first_card_matrix
 from src.metrics.top_k_combo_accuracy_base import TopKComboAccuracyBase
 
 

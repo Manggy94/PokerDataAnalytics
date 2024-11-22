@@ -1,5 +1,5 @@
-from src.mappers.combos_to_suits import combos_suits_matrix
-from src.loss_functions.combos_crossentropy_base import CombosCrossEntropyBase
+from src.mappers.combos.categorical.combos_to_suits import combos_suits_matrix
+from src.loss_functions.combos.categorical.combos_crossentropy_base import CombosCrossEntropyBase
 
 
 class CombosSuitsCrossEntropy(CombosCrossEntropyBase):

@@ -1,4 +1,4 @@
-from src.mappers.combos_to_first_rank import combos_first_rank_matrix
+from src.mappers.combos.categorical.combos_to_first_rank import combos_first_rank_matrix
 from src.metrics.top_k_combo_accuracy_base import TopKComboAccuracyBase
 
 

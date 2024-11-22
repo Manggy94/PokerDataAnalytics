@@ -8,7 +8,7 @@ class AreaUnderCoverageCurve(tf.keras.metrics.Metric):
         self.num_batches = self.add_weight(name="num_batches", initializer="zeros", dtype=tf.int32)
 
     @staticmethod
-    def area_under_coverage_curve(y_true, y_pred):
+    def compute_area_under_coverage_curve(y_true, y_pred):
         """
         Calcule l'aire sous la Coverage Curve (AUCC).
 
@@ -35,7 +35,7 @@ class AreaUnderCoverageCurve(tf.keras.metrics.Metric):
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         # Calculer l'AUCC pour le batch courant
-        batch_aucc = self.area_under_coverage_curve(y_true, y_pred)
+        batch_aucc = self.compute_area_under_coverage_curve(y_true, y_pred)
 
         # Mettre à jour les accumulateurs
         self.aucc_accumulator.assign_add(batch_aucc)

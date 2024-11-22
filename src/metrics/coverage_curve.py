@@ -7,11 +7,11 @@ class CoverageCurve(tf.keras.metrics.Metric):
     """
     def __init__(self, name="coverage_curve", **kwargs):
         super(CoverageCurve, self).__init__(name=name, **kwargs)
-        self.coverage_curve = self.add_weight(name="coverage_curve", shape=(0,), initializer="zeros", aggregation=tf.VariableAggregation.NONE)
-        self.num_labels = self.add_weight(name="num_labels", initializer="zeros", dtype=tf.int32, trainable=False)
+        self.coverage_curve_sum = self.add_weight(name="coverage_curve_sum", shape=(1,), initializer="zeros", dtype=tf.float32)
+        self.num_batches = self.add_weight(name="num_batches", initializer="zeros", dtype=tf.int32)
 
     @staticmethod
-    def coverage_curve(y_true, y_pred):
+    def compute_coverage_curve(y_true, y_pred):
         """
         Calcule les valeurs de top-k accuracy pour tous les k de 1 à y_true.shape[1].
 
@@ -20,7 +20,7 @@ class CoverageCurve(tf.keras.metrics.Metric):
             y_pred (tf.Tensor): Matrice des scores prédits (shape: [n_samples, n_labels]).
 
         Returns:
-            coverage_curve (tf.Tensor): Vecteur de précision cumulée pour tous les k.
+            tf.Tensor: Vecteur de précision cumulée pour tous les k.
         """
         # Tri des indices par score décroissant pour chaque échantillon
         sorted_indices = tf.argsort(y_pred, direction="DESCENDING", axis=-1)
@@ -32,17 +32,36 @@ class CoverageCurve(tf.keras.metrics.Metric):
 
         # Calcul des précisions cumulées
         coverage_curve = tf.divide(cumulative_correct, total_labels)  # Diviser par le total de labels positifs
-        return coverage_curve
+        return tf.reduce_mean(coverage_curve, axis=0)  # Moyenne des courbes sur tous les échantillons du batch
 
     def update_state(self, y_true, y_pred, sample_weight=None):
+        """
+        Met à jour l'état avec les données du batch courant.
+
+        Args:
+            y_true (tf.Tensor): Labels vrais (shape: [n_samples, n_labels]).
+            y_pred (tf.Tensor): Scores prédits (shape: [n_samples, n_labels]).
+            sample_weight (tf.Tensor, optional): Poids des échantillons. Non utilisé ici.
+        """
         # Calcul de la courbe de couverture pour le batch courant
-        batch_coverage_curve = self.coverage_curve(y_true, y_pred)
-        self.coverage_curve.assign(tf.reduce_mean(batch_coverage_curve, axis=0))  # Moyenne sur les échantillons du batch
-        self.num_labels.assign(y_true.shape[1])
+        batch_coverage_curve = self.compute_coverage_curve(y_true, y_pred)
+
+        # Ajouter les résultats à l'accumulateur
+        self.coverage_curve_sum.assign_add(batch_coverage_curve)
+        self.num_batches.assign_add(1)
 
     def result(self):
-        return self.coverage_curve[:self.num_labels]
+        """
+        Retourne la couverture moyenne calculée sur tous les batches.
+
+        Returns:
+            tf.Tensor: La courbe de couverture moyenne.
+        """
+        return self.coverage_curve_sum / tf.cast(self.num_batches, tf.float32)
 
     def reset_states(self):
-        self.coverage_curve.assign(tf.zeros((0,), dtype=tf.float32))
-        self.num_labels.assign(0)
+        """
+        Réinitialise les états internes de la métrique.
+        """
+        self.coverage_curve_sum.assign(tf.zeros_like(self.coverage_curve_sum))
+        self.num_batches.assign(0)

@@ -1,5 +1,5 @@
-from src.loss_functions.combos_crossentropy_base import CombosCrossEntropyBase
-from src.mappers.combos_to_hands import combos_hands_matrix
+from src.loss_functions.combos.categorical.combos_crossentropy_base import CombosCrossEntropyBase
+from src.mappers.combos.categorical.combos_to_hands import combos_hands_matrix
 
 
 class CombosHandsCrossEntropy(CombosCrossEntropyBase):
