@@ -1,19 +1,21 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import MinMaxScaler
 
 
-class MinMaxScaler(BaseEstimator, TransformerMixin):
+class FeaturesScaler(BaseEstimator, TransformerMixin):
 
     def __init__(self):
-        self.min = None
-        self.max = None
+        self.scaler = MinMaxScaler()
 
     def fit(self, X: pd.DataFrame, y=None):
-        self.min = X.min()
-        self.max = X.max()
+        self.scaler.fit(X)
         return self
 
     def transform(self, X: pd.DataFrame):
-        X = (X - self.min) / (self.max - self.min)
-        X = X.fillna(0)
+        X = pd.DataFrame(self.scaler.transform(X), columns=X.columns, index=X.index)
+        return X
+
+    def inverse_transform(self, X: pd.DataFrame):
+        X = pd.DataFrame(self.scaler.inverse_transform(X), columns=X.columns, index=X.index)
         return X

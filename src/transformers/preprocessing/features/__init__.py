@@ -25,3 +25,8 @@ class GlobalFeaturesPreprocessor(BaseEstimator, TransformerMixin):
         reducer = Float64Reducer()
         X = reducer.fit_transform(X)
         return X
+
+    def inverse_transform(self, X):
+        X = self.numerical_features_pipeline.inverse_transform(X)
+        X = self.categorical_features_pipeline.inverse_transform(X)
+        return X
