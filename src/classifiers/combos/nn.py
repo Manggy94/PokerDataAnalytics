@@ -4,7 +4,7 @@ from plotly.subplots import make_subplots
 from scikeras.wrappers import KerasClassifier
 from sklearn.base import BaseEstimator, ClassifierMixin
 from src.callbacks import EarlyStopping
-from src.layers import Dense, CombosCorrectionLayer, InputLayer, Dropout
+from src.layers import Dense, CombosCorrectionLayer, Input, InputLayer, Dropout
 from src.loss_functions.combos import CombosCrossEntropy
 from src.metrics.coverage_curve import CoverageCurve
 from src.metrics.top_k_combos_accuracy import TopKCombosAccuracy
@@ -28,7 +28,7 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
                  **kwargs
                  ):
 
-        self.keras_clf = None
+        self.model = None
         self.n_layers = n_layers
         self.n_neurons = n_neurons
         self.dropout = dropout
@@ -84,24 +84,24 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
             restore_best_weights=True
         )
 
-    def _build_deep_layers(self):
-        deep_layers = Sequential(name="Deep Layers")
-        for i in range(self.n_layers):
-            deep_layers.add(Dense(self.n_neurons, activation="relu", name=f"hidden_layer_{i+1}"))
-            if self.dropout:
-                deep_layers.add(Dropout(self.dropout))
-        return deep_layers
 
 
-    def _build_model(self, input_dim):
-        model = Sequential(name="CombosNNClassifier")
-        model.add(InputLayer(shape=(input_dim,), name="input_layer"))
+    def _build_model(self, input_dim, y_corrector):
+        features_input = Input(shape=(input_dim,), name="features_input")
+        y_corrector_input = Input(shape=(1326,), name="y_corrector_input")
+        x = features_input
         for i in range(self.n_layers):
-            model.add(Dense(self.n_neurons, activation="relu", name=f"hidden_layer_{i+1}"))
+            x = Dense(self.n_neurons, activation="relu", name=f"hidden_layer_{i+1}")(x)
             if self.dropout:
-                model.add(Dropout(self.dropout))
-        model.add(Dense(1326, activation="softmax", name="output_layer"))
-        # model.add(CombosCorrectionLayer(y_corrector=self.y_corrector, name="combos_correction_layer"))
+                x = Dropout(self.dropout, name=f"dropout_{i+1}")(x)
+        y_pred = Dense(1326, activation="softmax", name="raw_prediction_layer")(x)
+        y_corrected = CombosCorrectionLayer(name="combos_correction_layer")(y_pred, y_corrector_input)
+        model_input  = (features_input, y_corrector_input)
+        model = Model(
+            inputs=model_input,
+            outputs=y_corrected,
+            name="CombosNNClassifier"
+        )
         model.compile(optimizer=self.optimizer,
                       loss=self.loss_fn,
                       metrics=[CoverageCurve(), TopKCombosAccuracy(300),]
@@ -112,26 +112,29 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         input_dim = X.shape[1]
         X_cards = self.preprocessor.retrieve_known_cards(X)
-        self.y_corrector = self.targets_corrector.fit_transform(X_cards)
-        print(self.y_corrector)
-        self.keras_clf = KerasClassifier(
-            model=lambda: self._build_model(input_dim),
+        y_corrector = self.targets_corrector.fit_transform(X_cards)
+        model_inputs = (X, y_corrector)
+        self.model = self._build_model(input_dim, y_corrector)
+        self.model.fit(
+            model_inputs, y,
             epochs=self.epochs,
             batch_size=self.batch_size,
             validation_split=0.2,
             verbose=1,
             callbacks=[self.early_stopping]
-
         )
-        self.keras_clf.fit(X, y)
-        self.history = self.keras_clf.model_.history.history
+        self.history = self.model.history.history
         return self
 
-    def predict(self, X):
-        return self.keras_clf.predict(X)
-
     def predict_proba(self, X):
-        return self.keras_clf.predict_proba(X)
+        X_cards = self.preprocessor.retrieve_known_cards(X)
+        y_corrector = self.targets_corrector.transform(X_cards)
+        model_inputs = (X, y_corrector)
+        return self.model.predict(model_inputs)
+
+    def predict(self, X):
+        predictions = self.predict_proba(X)
+        return predictions.argmax(axis=1)
 
     def plot_training_graphs(self):
         """
