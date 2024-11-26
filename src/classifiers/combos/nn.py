@@ -7,7 +7,7 @@ from src.callbacks import EarlyStopping
 from src.layers import Dense, CombosCorrectionLayer, Input, Dropout
 from src.loss_functions.combos import CombosCrossEntropy
 from src.metrics.coverage_curves.base import CoverageCurveBase
-from src.metrics.top_k_accuracies.top_k_combos_accuracy import TopKCombosAccuracy
+from src.metrics.top_k_accuracies.combos import TopKCombosAccuracy
 from src.models import Model
 from src.optimizers import Adam, Adamax, Adagrad, RMSprop, SGD
 from src.pipelines.preprocessing.features.models.neural_network import NeuralNetworkFeaturesPreprocessor
@@ -115,7 +115,6 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
 
     def dummy_predict_proba(self, X):
         dummy_proba = self.dummy.predict_proba(X)
-        print(dummy_proba, type(dummy_proba))
         return dummy_proba
 
     def predict(self, X):
