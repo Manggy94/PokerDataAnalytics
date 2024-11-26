@@ -1,14 +1,14 @@
+import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 from plotly.subplots import make_subplots
-from scikeras.wrappers import KerasClassifier
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.dummy import DummyClassifier
 from src.callbacks import EarlyStopping
-from src.layers import Dense, CombosCorrectionLayer, Input, InputLayer, Dropout
+from src.layers import Dense, CombosCorrectionLayer, Input, Dropout
 from src.loss_functions.combos import CombosCrossEntropy
-from src.metrics.coverage_curve import CoverageCurve
-from src.metrics.top_k_combos_accuracy import TopKCombosAccuracy
-from src.models import Model, Sequential
+from src.metrics.coverage_curves.base import CoverageCurveBase
+from src.metrics.top_k_accuracies.top_k_combos_accuracy import TopKCombosAccuracy
+from src.models import Model
 from src.optimizers import Adam, Adamax, Adagrad, RMSprop, SGD
 from src.pipelines.preprocessing.features.models.neural_network import NeuralNetworkFeaturesPreprocessor
 from src.transformers.preprocessing.targets.target_corrector import TargetCorrector
@@ -27,7 +27,6 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
                  preprocessor: NeuralNetworkFeaturesPreprocessor = None,
                  **kwargs
                  ):
-
         self.model = None
         self.n_layers = n_layers
         self.n_neurons = n_neurons
@@ -41,28 +40,17 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         self.targets_corrector = TargetCorrector()
         self.y_corrector = None
         self.preprocessor = preprocessor
-        self.combos_factor = kwargs.get("combos_factor", 1)
-        self.hands_factor = kwargs.get("hands_factor", 1)
-        self.suits_factor = kwargs.get("suits_factor", 1)
-        self.ranks_factor = kwargs.get("ranks_factor", 1)
-        self.first_rank_factor = kwargs.get("first_rank_factor", 1)
-        self.first_card_factor = kwargs.get("first_card_factor", 1)
-        self.second_rank_factor = kwargs.get("second_rank_factor", 1)
-        self.second_card_factor = kwargs.get("second_card_factor", 1)
-        self.rank_difference_factor = kwargs.get("rank_difference_factor", 1)
-        self.forbidden_combos_factor = kwargs.get("forbidden_combos_factor", 1)
-        self.loss_fn = CombosCrossEntropy(
-            combos_factor=self.combos_factor,
-            hands_factor=self.hands_factor,
-            suits_factor=self.suits_factor,
-            ranks_factor=self.ranks_factor,
-            first_rank_factor=self.first_rank_factor,
-            first_card_factor=self.first_card_factor,
-            second_rank_factor=self.second_rank_factor,
-            second_card_factor=self.second_card_factor,
-            rank_difference_factor=self.rank_difference_factor
+        self.loss_fn = CombosCrossEntropy(**kwargs)
+        self._set_optimizer(optimizer_type, learning_rate)
+        self.dummy = DummyClassifier(strategy="prior")
+        self.early_stopping = EarlyStopping(
+            monitor="val_loss",
+            mode="min",
+            patience=10,
+            restore_best_weights=True
         )
 
+    def _set_optimizer(self, optimizer_type: str, learning_rate: float):
         match optimizer_type:
             case "adam":
                 self.optimizer = Adam(learning_rate=learning_rate)
@@ -77,16 +65,8 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
             case _:
                 raise ValueError(f"Unknown optimizer {optimizer_type}")
 
-        self.early_stopping = EarlyStopping(
-            monitor="val_loss",
-            mode="min",
-            patience=10,
-            restore_best_weights=True
-        )
 
-
-
-    def _build_model(self, input_dim, y_corrector):
+    def _build_model(self, input_dim):
         features_input = Input(shape=(input_dim,), name="features_input")
         y_corrector_input = Input(shape=(1326,), name="y_corrector_input")
         x = features_input
@@ -104,7 +84,7 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         )
         model.compile(optimizer=self.optimizer,
                       loss=self.loss_fn,
-                      metrics=[CoverageCurve(), TopKCombosAccuracy(300),]
+                      metrics=[CoverageCurveBase(), TopKCombosAccuracy(300), ]
                       )
         model.summary()
         return model
@@ -114,7 +94,7 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         X_cards = self.preprocessor.retrieve_known_cards(X)
         y_corrector = self.targets_corrector.fit_transform(X_cards)
         model_inputs = (X, y_corrector)
-        self.model = self._build_model(input_dim, y_corrector)
+        self.model = self._build_model(input_dim)
         self.model.fit(
             model_inputs, y,
             epochs=self.epochs,
@@ -124,6 +104,7 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
             callbacks=[self.early_stopping]
         )
         self.history = self.model.history.history
+        self.dummy.fit(X, y)
         return self
 
     def predict_proba(self, X):
@@ -132,9 +113,17 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         model_inputs = (X, y_corrector)
         return self.model.predict(model_inputs)
 
+    def dummy_predict_proba(self, X):
+        dummy_proba = self.dummy.predict_proba(X)
+        print(dummy_proba, type(dummy_proba))
+        return dummy_proba
+
     def predict(self, X):
         predictions = self.predict_proba(X)
         return predictions.argmax(axis=1)
+
+    def dummy_predict(self, X):
+        return self.dummy.predict(X)
 
     def plot_training_graphs(self):
         """

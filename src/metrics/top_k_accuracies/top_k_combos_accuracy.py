@@ -1,5 +1,5 @@
 import numpy as np
-from src.metrics.top_k_combo_accuracy_base import TopKComboAccuracyBase
+from src.metrics.top_k_accuracies.base import TopKComboAccuracyBase
 
 
 class TopKCombosAccuracy(TopKComboAccuracyBase):

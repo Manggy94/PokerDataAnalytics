@@ -9,3 +9,6 @@ class TargetOneHotEncoder(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         return pd.get_dummies(X)
+
+    def inverse_transform(self, X: pd.DataFrame):
+        return X.idxmax(axis=1)

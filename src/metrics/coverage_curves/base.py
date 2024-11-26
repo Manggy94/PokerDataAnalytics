@@ -1,16 +1,18 @@
 import numpy as np
 import plotly.graph_objects as go
 import tensorflow as tf
+from sklearn.dummy import DummyClassifier
 
 
-class CoverageCurve(tf.keras.metrics.Metric):
+class CoverageCurveBase(tf.keras.metrics.Metric):
     """
     Metric that computes the Area Under Coverage Curve (AUCC) for multi-label classification tasks.
     """
     def __init__(self, name="area_under_coverage_curve", **kwargs):
-        super(CoverageCurve, self).__init__(name=name, **kwargs)
+        super(CoverageCurveBase, self).__init__(name=name, **kwargs)
         self.aucc_accumulator = self.add_weight(name="aucc", initializer="zeros", dtype=tf.float32)
         self.num_batches = self.add_weight(name="num_batches", initializer="zeros", dtype=tf.int32)
+        self.dummy = DummyClassifier(strategy="prior")
 
     @staticmethod
     def compute_coverage_curve(y_true, y_pred):
@@ -78,12 +80,12 @@ class CoverageCurve(tf.keras.metrics.Metric):
         self.aucc_accumulator.assign(0.0)
         self.num_batches.assign(0)
 
-    def plot_coverage_curve(self, y_true, y_pred):
+    def plot_coverage_curve(self, y_true, y_pred, dummy_pred=None, target="Combos" ):
         """
         Trace la courbe de couverture à partir de y_true et y_pred.
         """
         coverage_vector = self.compute_coverage_curve(y_true, y_pred).numpy()
-
+        aucc = self.compute_area_under_coverage_curve(y_true, y_pred)
         x_labels = np.arange(1, len(coverage_vector) + 1) / len(coverage_vector) * 100
         x_ticks = np.linspace(0, 100, 9)
 
@@ -93,7 +95,7 @@ class CoverageCurve(tf.keras.metrics.Metric):
                 x=x_labels,
                 y=coverage_vector,
                 mode="lines+markers",
-                name="Coverage Curve",
+                name=f"{target} Coverage Curve",
                 marker=dict(size=6, color="blue"),
                 line=dict(color="blue", width=2),
             )
@@ -101,7 +103,7 @@ class CoverageCurve(tf.keras.metrics.Metric):
 
         # Mise en page
         fig.update_layout(
-            title="Coverage Curve",
+            title=f"{target} Coverage Curve (AUCC: {aucc:.4f})",
             xaxis=dict(
                 title="Coverage (%)",
                 tickmode="array",
@@ -113,4 +115,20 @@ class CoverageCurve(tf.keras.metrics.Metric):
             ),
             template="plotly_white",
         )
+        # Set y min value to 0
+        fig.update_yaxes(range=[0, 1])
+        if dummy_pred:
+            print(dummy_pred)
+            dummy_coverage_vector = self.compute_coverage_curve(y_true, dummy_pred).numpy()
+            fig.add_trace(
+                go.Scatter(
+                    x=x_labels,
+                    y=dummy_coverage_vector,
+                    mode="lines+markers",
+                    name="Dummy Coverage Curve",
+                    marker=dict(size=6, color="red"),
+                    line=dict(color="red", width=2),
+                )
+            )
+
         fig.show()
