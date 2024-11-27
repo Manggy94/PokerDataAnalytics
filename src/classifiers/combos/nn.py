@@ -2,23 +2,26 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.dummy import DummyClassifier
-from src.callbacks import EarlyStopping
+from sklearn.metrics import make_scorer
+from datetime import datetime
+from src.callbacks import EarlyStopping, TensorBoard
+from src.classifiers.combos.random import RandomCombosClassifier
 from src.layers import Dense, CombosCorrectionLayer, Input, Dropout
 from src.loss_functions.combos import CombosCrossEntropy
 from src.metrics.coverage_curves.base import CoverageCurveBase
 from src.metrics.top_k_accuracies.combos import TopKCombosAccuracy
+from src.metrics.coverage_curves import  coverage_classes
 from src.models import Model
 from src.optimizers import Adam, Adamax, Adagrad, RMSprop, SGD
 from src.pipelines.preprocessing.features.models.neural_network import NeuralNetworkFeaturesPreprocessor
 from src.transformers.preprocessing.targets.target_corrector import TargetCorrector
 
-
+time_format = "%Y-%m-%d_%H-%M-%S"
 
 class CombosNNClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self,
-                 n_layers: int,
-                 n_neurons: int,
+                 n_layers: int=2,
+                 n_neurons: int=128,
                  dropout: float=0.0,
                  optimizer_type: str="adam",
                  learning_rate: float=0.001,
@@ -27,6 +30,7 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
                  preprocessor: NeuralNetworkFeaturesPreprocessor = None,
                  **kwargs
                  ):
+        self.model_name = f"CombosNNClassifier_{datetime.now().strftime(time_format)}"
         self.model = None
         self.n_layers = n_layers
         self.n_neurons = n_neurons
@@ -42,13 +46,18 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         self.preprocessor = preprocessor
         self.loss_fn = CombosCrossEntropy(**kwargs)
         self._set_optimizer(optimizer_type, learning_rate)
-        self.dummy = DummyClassifier(strategy="prior")
+        self.coverage_curve = CoverageCurveBase()
+        self.top_k_accuracy = TopKCombosAccuracy(300)
+        self.metrics = [self.coverage_curve, self.top_k_accuracy]
+        self.dummy = RandomCombosClassifier()
         self.early_stopping = EarlyStopping(
             monitor="val_loss",
             mode="min",
-            patience=10,
+            patience=8,
             restore_best_weights=True
         )
+        self.tb_dir = f"logs/tb/clf/combos/{self.model_name}"
+        self.tensorboard = TensorBoard(log_dir=self.tb_dir, histogram_freq=1)
 
     def _set_optimizer(self, optimizer_type: str, learning_rate: float):
         match optimizer_type:
@@ -80,19 +89,18 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         model = Model(
             inputs=model_input,
             outputs=y_corrected,
-            name="CombosNNClassifier"
+            name=self.model_name
         )
-        model.compile(optimizer=self.optimizer,
-                      loss=self.loss_fn,
-                      metrics=[CoverageCurveBase(), TopKCombosAccuracy(300), ]
-                      )
+        model.compile(optimizer=self.optimizer, loss=self.loss_fn, metrics=self.metrics)
         model.summary()
+        print(self.tb_dir)
         return model
 
     def fit(self, X, y):
         input_dim = X.shape[1]
         X_cards = self.preprocessor.retrieve_known_cards(X)
-        y_corrector = self.targets_corrector.fit_transform(X_cards)
+        self.targets_corrector.fit(X_cards)
+        y_corrector = self.targets_corrector.transform(X_cards)
         model_inputs = (X, y_corrector)
         self.model = self._build_model(input_dim)
         self.model.fit(
@@ -101,7 +109,8 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
             batch_size=self.batch_size,
             validation_split=0.2,
             verbose=1,
-            callbacks=[self.early_stopping]
+            callbacks=[self.early_stopping, self.tensorboard]
+
         )
         self.history = self.model.history.history
         self.dummy.fit(X, y)
@@ -120,6 +129,12 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         predictions = self.predict_proba(X)
         return predictions.argmax(axis=1)
+
+    def score(self, X, y, sample_weight=None):
+        y_pred_proba = self.predict_proba(X)
+        aucc = self.coverage_curve.compute_area_under_coverage_curve(y, y_pred_proba)
+        return aucc
+
 
     def dummy_predict(self, X):
         return self.dummy.predict(X)
@@ -148,5 +163,15 @@ class CombosNNClassifier(BaseEstimator, ClassifierMixin):
         fig.update_yaxes(title_text="Loss", row=1, col=1)
         fig.update_yaxes(title_text="Area Under Coverage Curve", row=1, col=2)
         fig.show()
+
+    def classification_report(self, X_test, y_test):
+        y_pred = self.predict(X_test)
+        y_proba = self.predict_proba(X_test)
+        dummy_pred = self.dummy_predict(X_test)
+        dummy_proba = self.dummy_predict_proba(X_test)
+        for coverage_class in coverage_classes:
+            coverage_fn = coverage_class()
+            coverage_fn.plot_coverage_curve(y_test, y_proba, dummy_proba=dummy_proba)
+        return None
 
 

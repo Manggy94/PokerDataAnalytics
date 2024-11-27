@@ -1,5 +1,5 @@
 from src.loss_functions.combos.categorical.combos_crossentropy_base import CombosCrossEntropyBase
-from src.mappers.combos.categorical.combos_to_hands import combos_hands_matrix
+from src.mappers.combos.categorical.hands import hands_matrix
 
 
 class CombosHandsCrossEntropy(CombosCrossEntropyBase):
@@ -8,4 +8,4 @@ class CombosHandsCrossEntropy(CombosCrossEntropyBase):
     """
 
     def __init__(self, name="combos_hands_crossentropy"):
-        super().__init__(combos_hands_matrix, name)
+        super().__init__(hands_matrix, name)

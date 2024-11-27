@@ -17,10 +17,10 @@ class CoverageCurve(CoverageCurveBase):
         transformed_y_true, transformed_y_pred = self.transform(y_true), self.transform(y_pred)
         return super().compute_coverage_curve(transformed_y_true, transformed_y_pred)
 
-    def plot_coverage_curve(self, y_true, y_pred, dummy_pred=None):
-        print(dummy_pred)
-        transformed_y_true, transformed_y_pred = self.transform(y_true), self.transform(y_pred)
-        return super().plot_coverage_curve(transformed_y_true, transformed_y_pred, target=self.target_name, dummy_pred=dummy_pred)
+    def plot_coverage_curve(self, y_true, y_proba, dummy_proba):
+        transformed_y_true, transformed_y_proba = self.transform(y_true), self.transform(y_proba)
+        transformed_dummy_proba = self.transform(dummy_proba) if dummy_proba is not None else None
+        return super().plot_coverage_curve(transformed_y_true, transformed_y_proba, target=self.target_name, dummy_proba=transformed_dummy_proba)
 
 
 

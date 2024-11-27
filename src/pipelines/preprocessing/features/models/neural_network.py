@@ -26,4 +26,5 @@ class NeuralNetworkFeaturesPreprocessor(Pipeline):
         X_ordinal_retrieved = pd.DataFrame(ordinal_data_retrieved, columns=ordinal_columns, index=X_ordinal.index)
         shown_cards_columns = [c for c in X_unscaled.columns if c.endswith("_card")]
         X_cards = X_ordinal_retrieved[shown_cards_columns].astype("category")
+        X_cards = X_cards.join(X["flag_is_hero"])
         return X_cards

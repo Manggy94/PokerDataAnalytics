@@ -1,5 +1,5 @@
+import numpy as np
 from src.loss_functions.combos.categorical.combos_crossentropy_base import CombosCrossEntropyBase
-from src.mappers.combos.categorical.combos_to_combos import combos_combos_matrix
 
 
 class CombosCombosCrossEntropy(CombosCrossEntropyBase):
@@ -8,4 +8,4 @@ class CombosCombosCrossEntropy(CombosCrossEntropyBase):
     """
 
     def __init__(self, name="combos_combos_crossentropy"):
-        super().__init__(combos_combos_matrix, name)
+        super().__init__(matrix_fn=lambda: np.eye(1326), name=name)
