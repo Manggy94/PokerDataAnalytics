@@ -1,17 +1,6 @@
 import tensorflow as tf
-from .binary import CombosBroadwayCrossEntropy, CombosConnectorCrossEntropy, CombosFaceCrossEntropy, \
-    CombosOffsuitCrossEntropy, CombosOneGapperCrossEntropy, CombosPairedCrossEntropy, CombosPremiumCrossEntropy, \
-    CombosSuitedConnectorCrossEntropy, CombosSuitedCrossEntropy, CombosSuperHandCrossEntropy, \
-    CombosSuperPremiumCrossEntropy, CombosTopHandCrossEntropy, CombosTwoGapperCrossEntropy
 from src.loss_functions.combos.categorical import categorical_crossentropy_classes, categorical_factor_names
 from src.loss_functions.combos.binary import binary_crossentropy_classes, binary_factor_names
-from .categorical import CombosFirstCardCrossEntropy, CombosFirstRankCrossEntropy, CombosHandsCrossEntropy, \
-    CombosRanksCrossEntropy, CombosRankDifferenceCrossEntropy, CombosSecondCardCrossEntropy, \
-    CombosSecondRankCrossEntropy, CombosSuitsCrossEntropy
-
-
-class CombosSuitedConnectorCross:
-    pass
 
 
 class CombosCrossEntropy(tf.keras.losses.Loss):
